@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin name="portfolio">
+	<title>Portfolio</title>
+	<summary>Allows to create a portfolio section</summary>
+	<author>Intelliants LLC</author>
+	<contributor>Intelliants LLC</contributor>
+	<version>3.3.1</version>
+	<date>2015-06-10</date>
+	<compatibility>3.3</compatibility>
+
+	<actions>
+		<action name="portfolio" url="portfolio/" icon="list" pages="portfolio:add,portfolio:edit">List</action>
+		<action name="portfolio_add" url="portfolio/add/" icon="plus" pages="portfolio:read,portfolio:edit">Add portfolio entry</action>
+		<action type="dashboard" name="dashboard_portfolio_add" url="portfolio/add/" icon="plus">New portfolio entry</action>
+	</actions>
+
+	<adminpages>
+		<page group="content" name="portfolio" order="60" url="portfolio/" menus="menu">Portfolio</page>
+	</adminpages>
+
+	<pages>
+		<page menus="main" name="portfolio" url="portfolio/">Portfolio</page>
+	</pages>
+
+	<phrases>
+		<phrase category="admin" key="pf_entries">Portfolio</phrase>
+		<phrase category="admin" key="pf_add">Add portfolio entry</phrase>
+		<phrase category="admin" key="pf_edit">Edit portfolio entry</phrase>
+		<phrase category="admin" key="pf_body">Description of your work</phrase>
+		<phrase category="admin" key="pf_tags">Tags</phrase>
+		<phrase category="admin" key="pf_tags_help">Separate tags with comma</phrase>
+		<phrase category="admin" key="pf_image">Image</phrase>
+		<phrase category="admin" key="pf_added">Your work added!</phrase>
+		<phrase category="admin" key="pf_deleted">Your work removed! =(</phrase>
+		
+		<phrase category="frontend" key="pf_view_all">View all</phrase>
+		<phrase category="frontend" key="pf_no_entries">Nothing to show right now. Content coming soon!</phrase>
+	</phrases>
+
+	<configgroup name="portfolio">Portfolio</configgroup>
+
+	<config group="portfolio" name="portfolio_page" type="divider">General</config>
+	<config group="portfolio" name="portfolio_entries_per_page" type="text" description="Number of displayed entries">16</config>
+	<config group="portfolio" name="portfolio_desc_length" type="text" description="Number of chars in short description">500</config>
+	<config group="portfolio" name="portfolio_entries_order" type="select" values="alphabetic,date" description="Entries order by">date</config>
+
+	<config group="portfolio" name="portfolio_images" type="divider">Images</config>
+	<config group="portfolio" name="portfolio_use_crop" type="radio" values="1,0" description="Use cropper for thumbnails">1</config>
+	<config group="portfolio" name="portfolio_image_width" type="text" description="Resized image width">800</config>
+	<config group="portfolio" name="portfolio_image_height" type="text" description="Resized image height">600</config>
+	<config group="portfolio" name="portfolio_thumbnail_width" type="text" description="Thumbnail width" private="0">300</config>
+	<config group="portfolio" name="portfolio_thumbnail_height" type="text" description="Thumbnail height" private="0">300</config>
+
+	<config group="portfolio" name="portfolio_block" type="divider">Block</config>
+	<config group="portfolio" name="portfolio_block_count" type="text" description="Number of displayed works">8</config>
+	<config group="portfolio" name="portfolio_block_desc_length" type="text" description="Number of chars in short description">200</config>
+
+	<blocks>
+		<block title="Portfolio" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="0" pages="index" classname="pf" order="5" filename="plugin:portfolio:block.new-portfolio-entries.tpl"><![CDATA[]]></block>
+	</blocks>
+
+	<hooks>
+		<hook name="phpCoreBeforePageDisplay" page_type="front">
+			<![CDATA[
+if (iaView::REQUEST_HTML == $iaView->getRequestType() && $iaView->blockExists('new_portfolio_entries'))
+{
+	$stmt = '`status` = :status AND `lang` = :language ORDER BY `date_added` DESC';
+	$iaDb->bind($stmt, array('status' => iaCore::STATUS_ACTIVE, 'language' => $iaView->language));
+
+	$entries = $iaDb->all(array('id', 'title', 'date_added', 'alias', 'body', 'image'), $stmt, 0, $iaCore->get('portfolio_block_count'), 'portfolio_entries');
+	$iaView->assign('block_portfolio_entries', $entries);
+}
+			]]>
+		</hook>
+		<hook name="adminDashboardStatistics" page_type="admin" pages="index"><![CDATA[$items['portfolio:portfolios'] = 'plugin';]]></hook>
+		<hook name="sitemapGeneration" page_type="admin" pages="index"><![CDATA[$items[] = 'portfolio:portfolio';]]></hook>
+	</hooks>
+
+	<install>
+		<sql>
+			<![CDATA[
+CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries` (
+	`id` smallint(5) unsigned NOT NULL auto_increment,
+	`title` tinytext NOT NULL,
+	`alias` varchar(155) NOT NULL,
+	`body` text NOT NULL,
+	`date_added` date NOT NULL,
+	`image` tinytext NOT NULL,
+	`tags` text NOT NULL,
+	`status` enum('inactive','active') NOT NULL default 'inactive',
+	`lang` char(2) NOT NULL,
+	PRIMARY KEY (`id`),
+	KEY `LANGUAGE` (`lang`),
+	FULLTEXT KEY `SEARCH` (`title`, `body`)
+) {mysql_version};
+			]]>
+		</sql>
+	</install>
+
+	<uninstall>
+		<sql>
+			<![CDATA[
+DROP TABLE IF EXISTS `{prefix}portfolio_entries`;
+			]]>
+		</sql>
+	</uninstall>
+</plugin>
