@@ -4,9 +4,9 @@
 	<summary>Allows to create a portfolio section</summary>
 	<author>Intelliants LLC</author>
 	<contributor>Intelliants LLC</contributor>
-	<version>3.3.1</version>
-	<date>2015-06-10</date>
-	<compatibility>3.3</compatibility>
+	<version>4.0.0</version>
+	<date>2016-01-06</date>
+	<compatibility>4.0</compatibility>
 
 	<actions>
 		<action name="portfolio" url="portfolio/" icon="list" pages="portfolio:add,portfolio:edit">List</action>
@@ -32,17 +32,20 @@
 		<phrase category="admin" key="pf_image">Image</phrase>
 		<phrase category="admin" key="pf_added">Your work added!</phrase>
 		<phrase category="admin" key="pf_deleted">Your work removed! =(</phrase>
-		
+
 		<phrase category="frontend" key="pf_view_all">View all</phrase>
 		<phrase category="frontend" key="pf_no_entries">Nothing to show right now. Content coming soon!</phrase>
 	</phrases>
 
 	<configgroup name="portfolio">Portfolio</configgroup>
 
-	<config group="portfolio" name="portfolio_page" type="divider">General</config>
-	<config group="portfolio" name="portfolio_entries_per_page" type="text" description="Number of displayed entries">16</config>
-	<config group="portfolio" name="portfolio_desc_length" type="text" description="Number of chars in short description">500</config>
+	<config group="portfolio" name="portfolio_page" type="divider">Portfolio page</config>
+	<config group="portfolio" name="portfolio_entries_per_page" type="text" description="Number of displayed entries per page">20</config>
+	<config group="portfolio" name="portfolio_desc_length" type="text" description="Number of chars in description">100</config>
 	<config group="portfolio" name="portfolio_entries_order" type="select" values="alphabetic,date" description="Entries order by">date</config>
+
+	<config group="portfolio" name="portfolio_block" type="divider">New Portfolios block</config>
+	<config group="portfolio" name="portfolio_block_count" type="text" description="Number of displayed works">4</config>
 
 	<config group="portfolio" name="portfolio_images" type="divider">Images</config>
 	<config group="portfolio" name="portfolio_use_crop" type="radio" values="1,0" description="Use cropper for thumbnails">1</config>
@@ -51,12 +54,8 @@
 	<config group="portfolio" name="portfolio_thumbnail_width" type="text" description="Thumbnail width" private="0">300</config>
 	<config group="portfolio" name="portfolio_thumbnail_height" type="text" description="Thumbnail height" private="0">300</config>
 
-	<config group="portfolio" name="portfolio_block" type="divider">Block</config>
-	<config group="portfolio" name="portfolio_block_count" type="text" description="Number of displayed works">8</config>
-	<config group="portfolio" name="portfolio_block_desc_length" type="text" description="Number of chars in short description">200</config>
-
 	<blocks>
-		<block title="Portfolio" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="0" pages="index" classname="pf" order="5" filename="plugin:portfolio:block.new-portfolio-entries.tpl"><![CDATA[]]></block>
+		<block title="New Portfolios" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="0" pages="index" classname="pf" order="5" filename="block.new-portfolio-entries"><![CDATA[]]></block>
 	</blocks>
 
 	<hooks>

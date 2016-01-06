@@ -1,12 +1,13 @@
+{ia_add_media files='css: _IA_URL_plugins/portfolio/templates/front/css/style'}
+
 {if isset($portfolio_entry)}
-	<div class="media ia-item portfolio-entry">
-		<p class="ia-item-date">{lang key='posted_on'} {$portfolio_entry.date_added|date_format:$core.config.date_format}</p>
+	<div class="portfolio-entry">
 
 		{if $portfolio_entry.image}
-			<div class="ia-item-image">{printImage imgfile=$portfolio_entry.image fullimage=true title=$portfolio_entry.title}</div>
+			{printImage imgfile=$portfolio_entry.image fullimage=true title=$portfolio_entry.title class='img-responsive m-b'}
 		{/if}
 
-		<div class="ia-item-body">{$portfolio_entry.body}</div>
+		{$portfolio_entry.body}
 
 		<hr>
 		<!-- AddThis Button BEGIN -->
@@ -22,20 +23,28 @@
 	</div>
 {else}
 	{if $portfolio_entries}
-		<div class="pf">
-			<div class="row-fluid">
+		<div class="portfolios">
+			<div class="row">
 				{foreach $portfolio_entries as $pf_entry}
-					<div class="span3">
-						<div class="pf__item">
+					<div class="col-md-3">
+						<div class="ia-item ia-item--card">
 							{if $pf_entry.image}
-								<a href="{$smarty.const.IA_URL}portfolio/{$pf_entry.id}-{$pf_entry.alias}" class="pf__item__image">{printImage imgfile=$pf_entry.image title=$pf_entry.title}</a>
+								<a href="{$smarty.const.IA_URL}portfolio/{$pf_entry.id}-{$pf_entry.alias}" class="ia-item__image">{printImage imgfile=$pf_entry.image title=$pf_entry.title}<span class="fa fa-eye"></span></a>
 							{/if}
+
+							<div class="ia-item__content">
+								<h4 class="ia-item__title">
+									<a href="{$smarty.const.IA_URL}portfolio/{$pf_entry.id}-{$pf_entry.alias}">{$pf_entry.title|escape: html}</a>
+								</h4>
+
+								<p class="text-muted">{$pf_entry.body|strip_tags|truncate:$core.config.portfolio_desc_length:'...'}</p>
+							</div>
 						</div>
 					</div>
 
 					{if $pf_entry@iteration % 4 == 0}
 						</div>
-						<div class="row-fluid">
+						<div class="row">
 					{/if}
 				{/foreach}
 			</div>
