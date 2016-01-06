@@ -44,7 +44,7 @@
 	<config group="portfolio" name="portfolio_desc_length" type="text" description="Number of chars in description">100</config>
 	<config group="portfolio" name="portfolio_entries_order" type="select" values="alphabetic,date" description="Entries order by">date</config>
 
-	<config group="portfolio" name="portfolio_block" type="divider">New Portfolios block</config>
+	<config group="portfolio" name="portfolio_block" type="divider">New Portfolio entries block</config>
 	<config group="portfolio" name="portfolio_block_count" type="text" description="Number of displayed works">4</config>
 
 	<config group="portfolio" name="portfolio_images" type="divider">Images</config>
@@ -55,7 +55,7 @@
 	<config group="portfolio" name="portfolio_thumbnail_height" type="text" description="Thumbnail height" private="0">300</config>
 
 	<blocks>
-		<block title="New Portfolios" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="0" pages="index" classname="pf" order="5" filename="block.new-portfolio-entries"><![CDATA[]]></block>
+		<block title="New Portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="0" pages="index" classname="pf" order="5" filename="block.new-portfolio-entries"><![CDATA[]]></block>
 	</blocks>
 
 	<hooks>

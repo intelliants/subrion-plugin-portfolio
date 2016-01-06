@@ -23,7 +23,7 @@
 	</div>
 {else}
 	{if $portfolio_entries}
-		<div class="portfolios">
+		<div class="portfolio-entries">
 			<div class="row">
 				{foreach $portfolio_entries as $pf_entry}
 					<div class="col-md-3">

@@ -1,5 +1,5 @@
 {if isset($block_portfolio_entries) && $block_portfolio_entries}
-	<div class="ia-items portfolios m-b">
+	<div class="ia-items portfolio-entries m-b">
 		<div class="row">
 			{foreach $block_portfolio_entries as $pf_entry}
 				<div class="col-md-3">
