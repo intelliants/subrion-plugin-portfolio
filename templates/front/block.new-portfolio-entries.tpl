@@ -27,7 +27,7 @@
 			{/foreach}
 		</div>
 
-		<p class="m-t-lg text-center">
+		<p class="m-t-md text-center">
 			<a class="btn btn-primary-outline m-r" href="{$smarty.const.IA_URL}portfolio/">{lang key='pf_view_all'}</a>
 		</p>
 	</div>
