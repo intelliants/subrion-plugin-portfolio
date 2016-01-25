@@ -42,7 +42,7 @@
 						</div>
 					</div>
 
-					{if $pf_entry@iteration % 4 == 0}
+					{if $pf_entry@iteration % 4 == 0 && !$pf_entry@last}
 						</div>
 						<div class="row">
 					{/if}
