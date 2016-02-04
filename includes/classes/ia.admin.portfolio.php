@@ -29,6 +29,8 @@ class iaPortfolio extends abstractPlugin
 	const ALIAS_SUFFIX = '.html';
 
 	protected static $_table = 'portfolio_entries';
+	protected $_tablePortfolioTags = 'portfolio_tags';
+	protected $_tablePortfolioEntriesTags = 'portfolio_entries_tags';
 
 	public $dashboardStatistics = true;
 
@@ -80,13 +82,29 @@ class iaPortfolio extends abstractPlugin
 		// if item exists, then remove it
 		if ($row = $this->iaDb->row_bind(array('title', 'image'), '`id` = :id', array('id' => $id)))
 		{
-			$result = (bool)$this->iaDb->delete(iaDb::convertIds($id), self::getTable());
+			$result[] = (bool)$this->iaDb->delete(iaDb::convertIds($id), self::getTable());
 
 			if ($row['image'] && $result) // we have to remove the assigned image as well
 			{
 				$iaPicture = $this->iaCore->factory('picture');
 				$iaPicture->delete($row['image']);
 			}
+
+			$result[] = (bool)$this->iaDb->delete(iaDb::convertIds($id, 'portfolio_id'), $this->_tablePortfolioEntriesTags);
+
+			$sql =
+				'DELETE ' .
+				'FROM `:prefix:table_portfolio_tags` ' .
+				'WHERE `id` NOT IN (' .
+					'SELECT DISTINCT `tag_id` ' .
+					'FROM `:prefix:table_portfolio_entries_tags`)';
+
+			$sql = iaDb::printf($sql, array(
+				'prefix' => $this->_iaDb->prefix,
+				'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
+				'table_portfolio_tags' => $this->_tablePortfolioTags
+			));
+			$result[] = (bool)$this->iaDb->query($sql);
 
 			if ($result)
 			{
@@ -97,6 +115,26 @@ class iaPortfolio extends abstractPlugin
 		$this->iaDb->resetTable();
 
 		return $result;
+	}
+
+	public function getTags($id)
+	{
+		$sql =
+			'SELECT GROUP_CONCAT(`title`) ' .
+			'FROM `:prefix:table_portfolio_tags` pt ' .
+			'WHERE `id` IN (' .
+			'SELECT `tag_id` ' .
+			'FROM `:prefix:table_portfolio_entries_tags` ' .
+			'WHERE `portfolio_id` = :id)';
+
+		$sql = iaDb::printf($sql, array(
+			'prefix' => $this->_iaDb->prefix,
+			'table_portfolio_tags' => $this->_tablePortfolioTags,
+			'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
+			'id' => $id
+		));
+
+		return $this->_iaDb->getOne($sql);
 	}
 
 	public function getSitemapEntries()

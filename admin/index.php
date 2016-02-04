@@ -28,6 +28,8 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 {
 	protected $_name = 'portfolio';
 	protected $_table = 'portfolio_entries';
+	protected $_tablePortfolioTags = 'portfolio_tags';
+	protected $_tablePortfolioEntriesTags = 'portfolio_entries_tags';
 
 	protected $_pluginName = 'portfolio';
 
@@ -72,7 +74,7 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 
 	protected function _setDefaultValues(array &$entry)
 	{
-		$entry['title'] = $entry['body'] = '';
+		$entry['title'] = $entry['body'] = $entry['tags'] = '';
 		$entry['lang'] = $this->_iaCore->iaView->language;
 		$entry['date_added'] = date(iaDb::DATETIME_FORMAT);
 		$entry['status'] = iaCore::STATUS_ACTIVE;
@@ -164,6 +166,7 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 
 		unset($entry['image-src']);
 		unset($entry['image-data']);
+		unset($entry['tags']);
 
 		return true;
 	}
@@ -183,5 +186,78 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 		);
 
 		$iaLog->write($actionCode, $params);
+
+		$this->_saveTags($data['tags']);
+	}
+
+	protected function _saveTags($tagsString)
+	{
+		$tags = array_filter(explode(',', $tagsString));
+
+		$this->_iaDb->setTable($this->_tablePortfolioEntriesTags);
+
+		$sql ='DELETE ' .
+			'FROM `:prefix:table_portfolio_tags` ' .
+			'WHERE `id` IN (' .
+			'SELECT DISTINCT `tag_id` ' .
+			'FROM `:prefix:table_portfolio_entries_tags` ' .
+			'WHERE `tag_id` IN (' .
+			'SELECT DISTINCT `tag_id` FROM `:prefix:table_portfolio_entries_tags` ' .
+			'WHERE `portfolio_id` = :id) ' .
+			'GROUP BY 1 ' .
+			'HAVING COUNT(*) = 1)';
+
+		$sql = iaDb::printf($sql, array(
+			'prefix' => $this->_iaDb->prefix,
+			'table_portfolio_tags' => $this->_tablePortfolioTags,
+			'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
+			'id' => $this->getEntryId()
+		));
+
+		$this->_iaDb->query($sql);
+		$sql =
+			'DELETE ' .
+			'FROM :prefix:table_portfolio_entries_tags ' .
+			'WHERE `portfolio_id` = :id';
+		$sql = iaDb::printf($sql, array(
+			'prefix' => $this->_iaDb->prefix,
+			'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
+			'id' => $this->getEntryId()
+		));
+
+		$this->_iaDb->query($sql);
+
+		$allTagTitles = $this->_iaDb->keyvalue(array('title','id'), null, $this->_tablePortfolioTags);
+
+		foreach ($tags as $tag)
+		{
+			$tagAlias = iaSanitize::alias(strtolower($tag));
+			$tagEntry = array(
+				'title' => $tag,
+				'alias' => $tagAlias
+			);
+			$tagId = isset($allTagTitles[$tag])
+				? $allTagTitles[$tag]
+				: $this->_iaDb->insert($tagEntry, null, $this->_tablePortfolioTags);
+
+			$tagPortfolioIds = array(
+				'portfolio_id' => $this->getEntryId(),
+				'tag_id' => $tagId
+			);
+
+			$this->_iaDb->insert($tagPortfolioIds);
+		}
+	}
+
+	protected function _assignValues(&$iaView, array &$entryData)
+	{
+		if ($this->getEntryId())
+		{
+			$entryData['tags'] = $this->getHelper()->getTags($this->getEntryId());
+		}
+		else if (isset($_POST['tags']))
+		{
+			$entryData['tags'] = iaSanitize::sql($_POST['tags']);
+		}
 	}
 }

@@ -24,14 +24,19 @@
  *
  ******************************************************************************/
 
-$iaDb->setTable('portfolio_entries');
+$iaPortfolio = $iaCore->factoryPlugin(IA_CURRENT_PLUGIN, iaCore::FRONT, 'portfolio');
+
+$iaDb->setTable($iaPortfolio::getTable());
 
 if (iaView::REQUEST_HTML == $iaView->getRequestType())
 {
 	$iaView->iaSmarty->compile_check = true;
 
-	unset($iaCore->iaView->blocks['left']);
-	unset($iaCore->iaView->blocks['right']);
+	if (1 == $iaCore->get('portfolio_disable_columns'))
+	{
+		unset($iaCore->iaView->blocks['left']);
+		unset($iaCore->iaView->blocks['right']);
+	}
 
 	if (isset($iaCore->requestPath[0]))
 	{
@@ -60,6 +65,7 @@ if (iaView::REQUEST_HTML == $iaView->getRequestType())
 			$openGraph['image'] = IA_CLEAR_URL . 'uploads/' . $portfolioEntry['image'];
 		}
 		$iaView->set('og', $openGraph);
+		$iaView->assign('tags', $iaPortfolio->getTags($id));
 		$iaView->assign('portfolio_entry', $portfolioEntry);
 
 		$iaView->title(iaSanitize::tags($portfolioEntry['title']));
@@ -84,6 +90,7 @@ if (iaView::REQUEST_HTML == $iaView->getRequestType())
 		$rows = $iaDb->all('SQL_CALC_FOUND_ROWS `id`, `title`, `date_added`, `body`, `alias`, `image`', $stmt . ' ' . $order, $pagination['start'], $pagination['limit']);
 		$pagination['total'] = $iaDb->foundRows();
 
+		$iaView->assign('tags', $iaPortfolio->getAllTags());
 		$iaView->assign('portfolio_entries', $rows);
 		$iaView->assign('pagination', $pagination);
 	}

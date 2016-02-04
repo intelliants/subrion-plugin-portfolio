@@ -32,7 +32,7 @@
 			<div class="row">
 				<label class="col col-lg-2 control-label" for="tags">{lang key='pf_tags'}</label>
 				<div class="col col-lg-4">
-					<input type="text" name="tags" id="tags" value="{if isset($item.tags)}{$item.tags}{/if}">
+					<input type="text" name="tags" value="{$item.tags|escape:'html'}" id="input-tag">
 					<p class="help-block">{lang key='pf_tags_help'}</p>
 				</div>
 			</div>

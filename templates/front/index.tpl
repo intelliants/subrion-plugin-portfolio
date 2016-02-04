@@ -9,6 +9,18 @@
 
 		{$portfolio_entry.body}
 
+		<div class="tags">
+			<span class="fa fa-tags"></span>
+			{if $tags}
+				{lang key='tags'}:
+				{foreach $tags as $tag}
+					<a href="{$smarty.const.IA_URL}portfolio/tag/{$tag.alias}">{$tag.title|escape:'html'}</a>{if !$tag@last}, {/if}
+				{/foreach}
+			{else}
+				{lang key='no_tags'}
+			{/if}
+		</div>
+
 		<hr>
 		<!-- AddThis Button BEGIN -->
 		<div class="addthis_toolbox addthis_default_style">
@@ -38,6 +50,28 @@
 								</h4>
 
 								<p class="text-muted">{$pf_entry.body|strip_tags|truncate:$core.config.portfolio_desc_length:'...'}</p>
+								<p><span class="fa fa-tags"></span>
+								{if $tags}
+									{$tagsExist=0}
+									{foreach $tags as $tag}
+										{if $pf_entry.id == $tag.portfolio_id}
+											{$tagsExist = $tagsExist + 1}
+										{/if}
+									{/foreach}
+									{if $tagsExist != 0}
+										{foreach $tags as $tag}
+											{if $pf_entry.id == $tag.portfolio_id}
+												<a href="{$smarty.const.IA_URL}portfolio/tag/{$tag.alias}">{$tag.title|escape: 'html'}</a>
+											{/if}
+										{/foreach}
+									{else}
+										{lang key='no_tags'}
+									{/if}
+
+								{else}
+									{lang key='no_tags'}
+								{/if}
+								</p>
 							</div>
 						</div>
 					</div>

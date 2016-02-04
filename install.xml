@@ -4,8 +4,8 @@
 	<summary>Allows to create a portfolio section</summary>
 	<author>Intelliants LLC</author>
 	<contributor>Intelliants LLC</contributor>
-	<version>4.0.0</version>
-	<date>2016-01-06</date>
+	<version>4.0.1</version>
+	<date>2016-02-04</date>
 	<compatibility>4.0</compatibility>
 
 	<actions>
@@ -20,6 +20,7 @@
 
 	<pages>
 		<page menus="main" name="portfolio" url="portfolio/">Portfolio</page>
+		<page name="portfolio_tag" url="portfolio/tag/" filename="tag">Portfolio Tags</page>
 	</pages>
 
 	<phrases>
@@ -40,6 +41,7 @@
 	<configgroup name="portfolio">Portfolio</configgroup>
 
 	<config group="portfolio" name="portfolio_page" type="divider">Portfolio page</config>
+	<config group="portfolio" name="portfolio_disable_columns" type="radio" values="1,0" description="Disable left and right columns on portfolio page">0</config>
 	<config group="portfolio" name="portfolio_entries_per_page" type="text" description="Number of displayed entries per page">20</config>
 	<config group="portfolio" name="portfolio_desc_length" type="text" description="Number of chars in description">100</config>
 	<config group="portfolio" name="portfolio_entries_order" type="select" values="alphabetic,date" description="Entries order by">date</config>
@@ -53,24 +55,15 @@
 	<config group="portfolio" name="portfolio_image_height" type="text" description="Resized image height">600</config>
 	<config group="portfolio" name="portfolio_thumbnail_width" type="text" description="Thumbnail width" private="0">300</config>
 	<config group="portfolio" name="portfolio_thumbnail_height" type="text" description="Thumbnail height" private="0">300</config>
+	<config group="portfolio" name="tag_number" type="text" description="Number of displayed tags">10</config>
 
 	<blocks>
+		<block title="Portfolio tags" name="portfolio_tags" position="left" type="smarty" sticky="0" pages="portfolio" filename="block.portfolio-tags"><![CDATA[]]></block>
 		<block title="New Portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="0" pages="index" classname="pf" order="5" filename="block.new-portfolio-entries"><![CDATA[]]></block>
 	</blocks>
 
 	<hooks>
-		<hook name="phpCoreBeforePageDisplay" page_type="front">
-			<![CDATA[
-if (iaView::REQUEST_HTML == $iaView->getRequestType() && $iaView->blockExists('new_portfolio_entries'))
-{
-	$stmt = '`status` = :status AND `lang` = :language ORDER BY `date_added` DESC';
-	$iaDb->bind($stmt, array('status' => iaCore::STATUS_ACTIVE, 'language' => $iaView->language));
-
-	$entries = $iaDb->all(array('id', 'title', 'date_added', 'alias', 'body', 'image'), $stmt, 0, $iaCore->get('portfolio_block_count'), 'portfolio_entries');
-	$iaView->assign('block_portfolio_entries', $entries);
-}
-			]]>
-		</hook>
+		<hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="plugins/portfolio/includes/hook.blocks-load.php"><![CDATA[]]></hook>
 		<hook name="adminDashboardStatistics" page_type="admin" pages="index"><![CDATA[$items['portfolio:portfolios'] = 'plugin';]]></hook>
 		<hook name="sitemapGeneration" page_type="admin" pages="index"><![CDATA[$items[] = 'portfolio:portfolio';]]></hook>
 	</hooks>
@@ -85,7 +78,6 @@ CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries` (
 	`body` text NOT NULL,
 	`date_added` date NOT NULL,
 	`image` tinytext NOT NULL,
-	`tags` text NOT NULL,
 	`status` enum('inactive','active') NOT NULL default 'inactive',
 	`lang` char(2) NOT NULL,
 	PRIMARY KEY (`id`),
@@ -94,12 +86,57 @@ CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries` (
 ) {mysql_version};
 			]]>
 		</sql>
+		<sql>
+			<![CDATA[
+CREATE TABLE IF NOT EXISTS `{prefix}portfolio_tags` (
+	`id` mediumint(8) unsigned NOT NULL auto_increment,
+	`title` varchar(50) NOT NULL,
+	`alias` varchar(50) NOT NULL,
+	PRIMARY KEY (`id`)
+) {mysql_version};
+			]]>
+		</sql>
+		<sql>
+			<![CDATA[
+CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries_tags` (
+	`portfolio_id` mediumint(8) unsigned NOT NULL,
+	`tag_id` mediumint(8) unsigned NOT NULL,
+	UNIQUE KEY `UNIQUE` (`tag_id`, `portfolio_id`)
+) {mysql_version};
+			]]>
+		</sql>
 	</install>
+
+	<upgrade>
+		<sql version="4.0.1">
+			<![CDATA[
+ALTER TABLE `{prefix}portfolio_entries` DROP `tags`;
+			]]>
+		</sql>
+		<sql version="4.0.1">
+			<![CDATA[
+CREATE TABLE IF NOT EXISTS `{prefix}portfolio_tags` (
+	`id` mediumint(8) unsigned NOT NULL auto_increment,
+	`title` varchar(50) NOT NULL,
+	`alias` varchar(50) NOT NULL,
+	PRIMARY KEY (`id`)
+) {mysql_version};
+			]]>
+		</sql>
+		<sql version="4.0.1">
+			<![CDATA[
+CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries_tags` (
+	`portfolio_id` mediumint(8) unsigned NOT NULL,
+	`tag_id` mediumint(8) unsigned NOT NULL,
+	UNIQUE KEY `UNIQUE` (`tag_id`, `portfolio_id`)
+) {mysql_version};
+			]]>
+	</upgrade>
 
 	<uninstall>
 		<sql>
 			<![CDATA[
-DROP TABLE IF EXISTS `{prefix}portfolio_entries`;
+DROP TABLE IF EXISTS `{prefix}portfolio_entries`, `{prefix}portfolio_tags`, `{prefix}portfolio_entries_tags`;
 			]]>
 		</sql>
 	</uninstall>

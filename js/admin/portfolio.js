@@ -83,6 +83,6 @@ Ext.onReady(function()
 			}
 		});
 
-		$('#tags').tagsInput({width: '100%', height: 'auto'});
+		$('#input-tag').tagsInput({width: '100%', height: 'auto'});
 	}
 });
