@@ -1,5 +1,4 @@
 /* New portfolio entries block */
-
 .portfolio-entries .ia-item__image:after {
 	display: block;
 	content: '';
@@ -44,11 +43,12 @@
 	opacity: 1;
 }
 
+
+
 /* Tags block */
 .ia-item__tags {
 	margin-top: 10px;
 }
-
 
 @media (min-width: 480px) {
 	.portfolio-entries .row + .row .ia-item--card .ia-item__image {
@@ -59,7 +59,6 @@
 
 
 /* Portfolio entries list page */
-
 .page-portfolio .portfolio-entries .ia-item__title {
 	margin-bottom: 5px;
 }
@@ -67,7 +66,6 @@
 
 
 /* View Portfolio entry page */
-
 .portfolio-entry > img {
 	width: 100%;
 }

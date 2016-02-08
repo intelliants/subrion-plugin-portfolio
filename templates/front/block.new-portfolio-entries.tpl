@@ -14,35 +14,31 @@
 							</h4>
 						</div>
 
-						<p class="ia-item__tags"><span class="fa fa-tags"></span>
-						{if $tags}
-							{$tagsExist=0}
-							{foreach $tags as $tag}
-								{if $pf_entry.id == $tag.portfolio_id}
-									{$tagsExist = $tagsExist + 1}
-								{/if}
-							{/foreach}
-							{if $tagsExist != 0}
+						<p class="ia-item__tags">
+							<span class="fa fa-tags"></span>
+							{if $tags}
+								{$tagsExist=0}
 								{foreach $tags as $tag}
 									{if $pf_entry.id == $tag.portfolio_id}
-										<a href="{$smarty.const.IA_URL}portfolio/tag/{$tag.alias}">{$tag.title|escape: 'html'}</a>
+										{$tagsExist = $tagsExist + 1}
 									{/if}
 								{/foreach}
+								{if $tagsExist != 0}
+									{foreach $tags as $tag}
+										{if $pf_entry.id == $tag.portfolio_id}
+											<a href="{$smarty.const.IA_URL}portfolio/tag/{$tag.alias}">{$tag.title|escape: 'html'}</a>
+										{/if}
+									{/foreach}
+								{else}
+									{lang key='no_tags'}
+								{/if}
+
 							{else}
 								{lang key='no_tags'}
 							{/if}
-
-						{else}
-							{lang key='no_tags'}
-						{/if}
 						</p>
 					</div>
 				</div>
-
-				{if $pf_entry@iteration % 4 == 0 && !$pf_entry@last}
-					</div>
-					<div class="row">
-				{/if}
 
 				{if $pf_entry@iteration == $core.config.portfolio_block_count}
 					{break}
