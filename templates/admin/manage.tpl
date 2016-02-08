@@ -8,7 +8,7 @@
 			</div>
 
 			<div class="row">
-				<label class="col col-lg-2 control-label" for="input-title">{lang key='title'}</label>
+				<label class="col col-lg-2 control-label" for="input-title">{lang key='title'} {lang key='field_required'}</label>
 				<div class="col col-lg-4">
 					<input type="text" name="title" value="{$item.title|escape:'html'}" id="input-title">
 				</div>
@@ -23,7 +23,7 @@
 			</div>
 
 			<div class="row">
-				<label class="col col-lg-2 control-label" for="body">{lang key='pf_body'}</label>
+				<label class="col col-lg-2 control-label" for="body">{lang key='pf_body'} {lang key='field_required'}</label>
 				<div class="col col-lg-8">
 					{ia_wysiwyg name='body' value=$item.body}
 				</div>
@@ -44,7 +44,7 @@
 			</div>
 
 			<div class="row">
-				<label class="col col-lg-2 control-label" for="input-image">{lang key='image'}</label>
+				<label class="col col-lg-2 control-label" for="input-image">{lang key='image'} {lang key='field_required'}</label>
 				<div class="col col-lg-4">
 					{if !$core.config.portfolio_use_crop && isset($item.image) && $item.image}
 						<div class="input-group thumbnail thumbnail-single with-actions">

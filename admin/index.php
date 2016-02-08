@@ -108,7 +108,7 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 
 		if (empty($entry['body']))
 		{
-			$this->addMessage('body_is_empty');
+			$this->addMessage(iaLanguage::getf('field_is_empty', array('field' => iaLanguage::get('description'))), false);
 		}
 
 		if (empty($entry['date_added']))
@@ -164,9 +164,7 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 			return false;
 		}
 
-		unset($entry['image-src']);
-		unset($entry['image-data']);
-		unset($entry['tags']);
+		unset($entry['image-src'], $entry['image-data'], $entry['tags']);
 
 		return true;
 	}

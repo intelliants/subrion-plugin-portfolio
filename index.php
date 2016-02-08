@@ -34,8 +34,7 @@ if (iaView::REQUEST_HTML == $iaView->getRequestType())
 
 	if (1 == $iaCore->get('portfolio_disable_columns'))
 	{
-		unset($iaCore->iaView->blocks['left']);
-		unset($iaCore->iaView->blocks['right']);
+		unset($iaCore->iaView->blocks['left'], $iaCore->iaView->blocks['right']);
 	}
 
 	if (isset($iaCore->requestPath[0]))
