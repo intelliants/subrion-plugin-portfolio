@@ -100,7 +100,7 @@ class iaPortfolio extends abstractPlugin
 					'FROM `:prefix:table_portfolio_entries_tags`)';
 
 			$sql = iaDb::printf($sql, array(
-				'prefix' => $this->_iaDb->prefix,
+				'prefix' => $this->iaDb->prefix,
 				'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
 				'table_portfolio_tags' => $this->_tablePortfolioTags
 			));
@@ -128,13 +128,13 @@ class iaPortfolio extends abstractPlugin
 			'WHERE `portfolio_id` = :id)';
 
 		$sql = iaDb::printf($sql, array(
-			'prefix' => $this->_iaDb->prefix,
+			'prefix' => $this->iaDb->prefix,
 			'table_portfolio_tags' => $this->_tablePortfolioTags,
 			'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
 			'id' => $id
 		));
 
-		return $this->_iaDb->getOne($sql);
+		return $this->iaDb->getOne($sql);
 	}
 
 	public function getSitemapEntries()
