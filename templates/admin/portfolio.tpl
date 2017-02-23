@@ -112,4 +112,4 @@
 	</div>
 </form>
 
-{ia_add_media files='tagsinput, css:_IA_URL_plugins/portfolio/templates/admin/css/style, js:_IA_URL_plugins/portfolio/js/cropper/cropper.min, js:_IA_URL_plugins/portfolio/js/admin/crop, css:_IA_URL_plugins/portfolio/js/cropper/cropper, js:_IA_URL_plugins/portfolio/js/admin/portfolio'}
+{ia_add_media files='tagsinput, css:_IA_URL_modules/portfolio/templates/admin/css/style, js:_IA_URL_modules/portfolio/js/cropper/cropper.min, js:_IA_URL_modules/portfolio/js/admin/crop, css:_IA_URL_modules/portfolio/js/cropper/cropper, js:_IA_URL_modules/portfolio/js/admin/portfolio'}

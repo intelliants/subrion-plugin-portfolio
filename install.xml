@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<plugin name="portfolio">
+<module type="plugin" name="portfolio">
 	<title>Portfolio</title>
 	<summary>Allows to create a portfolio section</summary>
 	<author>Intelliants LLC</author>
@@ -63,7 +63,7 @@
 	</blocks>
 
 	<hooks>
-		<hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="plugins/portfolio/includes/hook.blocks-load.php"><![CDATA[]]></hook>
+		<hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load"><![CDATA[]]></hook>
 		<hook name="adminDashboardStatistics" page_type="admin" pages="index"><![CDATA[$items['portfolio:portfolios'] = 'plugin';]]></hook>
 		<hook name="sitemapGeneration" page_type="admin" pages="index"><![CDATA[$items[] = 'portfolio:portfolio';]]></hook>
 	</hooks>
@@ -140,4 +140,4 @@ CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries_tags` (
 ) {mysql_version};
 			]]>
 	</upgrade>
-</plugin>
+</module>

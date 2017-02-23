@@ -24,7 +24,7 @@
  *
  ******************************************************************************/
 
-$iaPortfolio = $iaCore->factoryPlugin(IA_CURRENT_PLUGIN, iaCore::FRONT, 'portfolio');
+$iaPortfolio = $iaCore->factoryPlugin(IA_CURRENT_MODULE);
 
 $iaDb->setTable($iaPortfolio::getTable());
 

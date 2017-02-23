@@ -24,7 +24,7 @@
  *
  ******************************************************************************/
 
-class iaPortfolio extends abstractPlugin
+class iaPortfolio extends abstractModuleAdmin
 {
 	const ALIAS_SUFFIX = '.html';
 

@@ -1,11 +1,11 @@
-{if isset($block_portfolio_entries) && $block_portfolio_entries}
+{if !empty($block_portfolio_entries)}
 	<div class="ia-items portfolio-entries m-b">
 		<div class="row">
 			{foreach $block_portfolio_entries as $pf_entry}
 				<div class="col-md-3">
 					<div class="ia-item ia-item--card">
 						{if $pf_entry.image}
-							<a href="{$smarty.const.IA_URL}portfolio/{$pf_entry.id}-{$pf_entry.alias}" class="ia-item__image">{printImage imgfile=$pf_entry.image title=$pf_entry.title}<span class="fa fa-eye"></span></a>
+							<a href="{$smarty.const.IA_URL}portfolio/{$pf_entry.id}-{$pf_entry.alias}" class="ia-item__image">{ia_image file=$pf_entry.image title=$pf_entry.title}<span class="fa fa-eye"></span></a>
 						{/if}
 
 						<div class="ia-item__content">
@@ -54,4 +54,4 @@
 	<div class="alert alert-info">{lang key='pf_no_entries'}</div>
 {/if}
 
-{ia_add_media files='css: _IA_URL_plugins/portfolio/templates/front/css/style'}
+{ia_add_media files='css: _IA_URL_modules/portfolio/templates/front/css/style'}

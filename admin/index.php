@@ -24,7 +24,7 @@
  *
  ******************************************************************************/
 
-class iaBackendController extends iaAbstractControllerPluginBackend
+class iaBackendController extends iaAbstractControllerModuleBackend
 {
 	protected $_name = 'portfolio';
 	protected $_table = 'portfolio_entries';
@@ -44,7 +44,7 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 	{
 		parent::__construct();
 
-		$iaPortfolio = $this->_iaCore->factoryPlugin($this->getPluginName(), iaCore::ADMIN, $this->getName());
+		$iaPortfolio = $this->_iaCore->factoryPlugin($this->getModuleName(), iaCore::ADMIN, $this->getName());
 		$this->setHelper($iaPortfolio);
 	}
 
@@ -118,39 +118,30 @@ class iaBackendController extends iaAbstractControllerPluginBackend
 
 		$entry['alias'] = $this->getHelper()->titleAlias(empty($entry['alias']) ? $entry['title'] : $entry['alias']);
 
-		if (isset($_FILES['image']['tmp_name']) && $_FILES['image']['tmp_name'])
+		if (isset($_FILES['image']['error']) && !$_FILES['image']['error'])
 		{
-			$this->_iaCore->loadClass(iaCore::CORE, 'picture');
-
-			$iaImage = $this->_iaCore->factoryPlugin($this->getPluginName(), iaCore::ADMIN, 'image');
-
-			$imageData = json_decode($entry['image-data'], true);
-			$path = iaUtil::getAccountDir();
-			$file = $_FILES['image'];
-			$token = iaUtil::generateToken();
-			$info = array(
-				'image_width' => $this->_iaCore->get('portfolio_image_width'),
-				'image_height' => $this->_iaCore->get('portfolio_image_height'),
-				'crop_width' => $imageData['width'],
-				'crop_height' => $imageData['height'],
-				'thumb_width' => $this->_iaCore->get('portfolio_thumbnail_width'),
-				'thumb_height' => $this->_iaCore->get('portfolio_thumbnail_height'),
-				'positionX' => $imageData['x'],
-				'positionY' => $imageData['y'],
-				'position' => 'LT',
-				'resize' => 'after_crop',
-				'resize_mode' => iaImage::CROP
-			);
-
-			if ($image = $iaImage->processFolioImage($file, $path, $token, $info))
+			try
 			{
-				if ($entry['image']) // it has an already assigned image
-				{
-					$iaImage = $this->_iaCore->factory('picture');
-					$iaImage->delete($entry['image']);
-				}
+				$iaField = $this->_iaCore->factory('field');
 
-				$entry['image'] = $image;
+				// $imageData = json_decode($entry['image-data'], true);
+
+				$path = $iaField->uploadImage(
+						$_FILES['image'],
+						$this->_iaCore->get('portfolio_image_width'),
+						$this->_iaCore->get('portfolio_image_height'),
+						$this->_iaCore->get('portfolio_thumbnail_width'),
+						$this->_iaCore->get('portfolio_thumbnail_height'),
+						// $imageData['width'],
+						// $imageData['height'],
+						'crop');
+
+				empty($entry['image']) || $iaField->deleteUploadedFile('image', $this->getTable(), $this->getEntryId(), $entry['image']);
+				$entry['image'] = $path;
+			}
+			catch (Exception $e)
+			{
+				$this->addMessage($e->getMessage(), false);
 			}
 		}
 
