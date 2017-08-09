@@ -1,57 +1,56 @@
-{if !empty($block_portfolio_entries)}
-	<div class="ia-items portfolio-entries m-b">
-		<div class="row">
-			{foreach $block_portfolio_entries as $pf_entry}
-				<div class="col-md-3">
-					<div class="ia-item ia-item--card">
-						{if $pf_entry.image}
-							<a href="{$smarty.const.IA_URL}portfolio/{$pf_entry.id}-{$pf_entry.alias}" class="ia-item__image">{ia_image file=$pf_entry.image title=$pf_entry.title}<span class="fa fa-eye"></span></a>
-						{/if}
+{if !empty($newPortfolioEntries)}
+    <div class="m-t m-b js-portfolio-filters">
+        <div class="btn btn-primary m-b-5" data-filter="*">{lang key='all'}</div>
+        {if !empty($newPortfolioEntriesCategories)}
+            {foreach $newPortfolioEntriesCategories as $id => $title}
+                <div class="btn btn-default m-b-5" data-filter=".cat-{$id}">{$title|escape}</div>
+            {/foreach}
+        {/if}
+    </div>
 
-						<div class="ia-item__content">
-							<h4 class="ia-item__title">
-								<a href="{$smarty.const.IA_URL}portfolio/{$pf_entry.id}-{$pf_entry.alias}">{$pf_entry.title|escape: html}</a>
-							</h4>
-						</div>
+    <div class="ia-items portfolio-entries">
+        <div class="row">
+            {foreach $newPortfolioEntries as $entry}
+                <div class="col-md-3 * cat-{$entry.category_id}">
+                    <div class="ia-item ia-item--card m-b">
+                        {if $entry.gallery}
+                            <a href="{$entry.link}" class="ia-item__image">
+                                {ia_image file=$entry.gallery|array_shift type='thumbnail' title=$entry.title|escape}
+                            </a>
+                        {/if}
 
-						<p class="ia-item__tags">
-							<span class="fa fa-tags"></span>
-							{if $tags}
-								{$tagsExist=0}
-								{foreach $tags as $tag}
-									{if $pf_entry.id == $tag.portfolio_id}
-										{$tagsExist = $tagsExist + 1}
-									{/if}
-								{/foreach}
-								{if $tagsExist != 0}
-									{foreach $tags as $tag}
-										{if $pf_entry.id == $tag.portfolio_id}
-											<a href="{$smarty.const.IA_URL}portfolio/tag/{$tag.alias}">{$tag.title|escape: 'html'}</a>
-										{/if}
-									{/foreach}
-								{else}
-									{lang key='no_tags'}
-								{/if}
+                        <div class="ia-item__content">
+                            <h4 class="ia-item__title text-center">
+                                <a href="{$entry.link}">{$entry.title|escape}</a>
+                            </h4>
+                        </div>
+                    </div>
+                </div>
+            {/foreach}
+        </div>
 
-							{else}
-								{lang key='no_tags'}
-							{/if}
-						</p>
-					</div>
-				</div>
-
-				{if $pf_entry@iteration == $core.config.portfolio_block_count}
-					{break}
-				{/if}
-			{/foreach}
-		</div>
-
-		<p class="m-t-md text-center">
-			<a class="btn btn-primary-outline m-r" href="{$smarty.const.IA_URL}portfolio/">{lang key='pf_view_all'}</a>
-		</p>
-	</div>
+        <div class="m-t text-center">
+            <a class="btn btn-primary text-uppercase" href="{$smarty.const.IA_URL}portfolio/">{lang key='view_all_portfolio_entries'}</a>
+        </div>
+    </div>
 {else}
-	<div class="alert alert-info">{lang key='pf_no_entries'}</div>
+    <div class="alert alert-info">{lang key='no_portfolio_entries'}</div>
 {/if}
 
-{ia_add_media files='css: _IA_URL_modules/portfolio/templates/front/css/style'}
+{ia_add_media files='js:_IA_URL_modules/portfolio/js/front/isotope.pkgd.min'}
+
+{ia_add_js}
+$(function(){
+    var $grid = $('.new-portfolio-entries .row').isotope(),
+        $filterBtn = $('.js-portfolio-filters > .btn');
+
+    $filterBtn.click(function() {
+        $filterBtn.removeClass('btn-primary').addClass('btn-default');
+        $(this).removeClass('btn-default').addClass('btn-primary');
+
+        var filterValue = $(this).attr('data-filter');
+
+        $grid.isotope({ filter: filterValue });
+    });
+});
+{/ia_add_js}

@@ -24,25 +24,20 @@
  *
  ******************************************************************************/
 
-if (iaView::REQUEST_HTML == $iaView->getRequestType()) {
-    if ($iaView->blockExists('top_portfolio_categories')) {
-        $iaCategory = $iaCore->factoryModule('categories', 'portfolio');
-        $topCategories = $iaCategory->getByLevel(1);
+class iaCategories extends iaAbstractFrontHelperCategoryFlat
+{
+    protected static $_table = 'portfolio_categs';
 
-        $iaView->assign('topPortfolioCategories', $topCategories);
-    }
+    protected $_itemName = 'portfolio_categs';
 
-    if ($iaView->blockExists('new_portfolio_entries')) {
-        $iaPortfolio = $iaCore->factoryModule('portfolio', 'portfolio');
+    protected $_moduleName = 'portfolio';
 
-        $entries = $iaPortfolio->getAll(iaDb::EMPTY_CONDITION, iaDb::ALL_COLUMNS_SELECTION, 0, $iaCore->get('portfolio_block_count'));
-        $categories = [];
+    protected $_patterns = [
+        'view' => 'portfolio/:title_alias'
+    ];
 
-        foreach ($entries as $entry) {
-            $categories[$entry['category_id']] = $entry['category_title'];
-        }
-
-        $iaView->assign('newPortfolioEntries', $entries);
-        $iaView->assign('newPortfolioEntriesCategories', $categories);
+    public function url($action, array $data)
+    {
+        return IA_URL . iaDb::printf($this->_patterns[$action], $data) . IA_URL_DELIMITER;
     }
 }

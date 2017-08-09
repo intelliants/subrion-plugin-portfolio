@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Subrion - open source content management system
- * Copyright (C) 2016 Intelliants, LLC <http://www.intelliants.com>
+ * Copyright (C) 2017 Intelliants, LLC <https://intelliants.com>
  *
  * This file is part of Subrion.
  *
@@ -20,81 +20,135 @@
  * along with Subrion. If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * @link http://www.subrion.org/
+ * @link https://subrion.org/
  *
  ******************************************************************************/
 
-$iaPortfolio = $iaCore->factoryPlugin(IA_CURRENT_MODULE);
+$iaPortfolio = $iaCore->factoryModule('portfolio', 'portfolio');
 
-$iaDb->setTable($iaPortfolio::getTable());
+if (iaView::REQUEST_HTML == $iaView->getRequestType()) {
+    $page = 'index';
 
-if (iaView::REQUEST_HTML == $iaView->getRequestType())
-{
-	$iaView->iaSmarty->compile_check = true;
+    array_shift($iaView->url);
 
-	if (1 == $iaCore->get('portfolio_disable_columns'))
-	{
-		unset($iaCore->iaView->blocks['left'], $iaCore->iaView->blocks['right']);
-	}
+    if ((int)end($iaView->url) && count($iaView->url) > 1) {
+        $page = 'view';
+    } elseif (count($iaView->url) > 0) {
+        $page = 'category';
+    }
 
-	if (isset($iaCore->requestPath[0]))
-	{
-		$id = (int)$iaCore->requestPath[0];
+    switch ($page) {
+        case 'index':
+            $pagination = [
+                'total' => 0,
+                'limit' => (int)$iaCore->get('portfolio_entries_per_page'),
+                'url' => $iaCore->factory('page', iaCore::FRONT)->getUrlByName('portfolio') . '?page={page}'
+            ];
 
-		if (!$id)
-		{
-			return iaView::errorPage(iaView::ERROR_NOT_FOUND);
-		}
+            $page = max(1, isset($_GET['page']) ? (int)$_GET['page'] : 1);
+            $start = ($page - 1) * $pagination['limit'];
 
-		$portfolioEntry = $iaDb->row_bind(iaDb::ALL_COLUMNS_SELECTION, 'id = :id AND `status` = :status', array('id' => $id, 'status' => iaCore::STATUS_ACTIVE));
+            $rows = $iaPortfolio->getAll(iaDb::EMPTY_CONDITION, iaDb::ALL_COLUMNS_SELECTION, $start, $pagination['limit']);
 
-		if (empty($portfolioEntry))
-		{
-			return iaView::errorPage(iaView::ERROR_NOT_FOUND);
-		}
+            $pagination['total'] = $iaPortfolio->getFoundRows();
 
-		iaBreadcrumb::toEnd($portfolioEntry['title'], IA_SELF);
-		$openGraph = array(
-			'title' => $portfolioEntry['title'],
-			'url' => IA_SELF,
-			'description' => $portfolioEntry['body']
-		);
-		if (isset($portfolioEntry['image']))
-		{
-			$openGraph['image'] = IA_CLEAR_URL . 'uploads/' . $portfolioEntry['image'];
-		}
-		$iaView->set('og', $openGraph);
-		$iaView->assign('tags', $iaPortfolio->getTags($id));
-		$iaView->assign('portfolio_entry', $portfolioEntry);
+            $iaView->assign('entries', $rows);
+            $iaView->assign('pagination', $pagination);
 
-		$iaView->title(iaSanitize::tags($portfolioEntry['title']));
-	}
-	else
-	{
-		$page = empty($_GET['page']) ? 0 : (int)$_GET['page'];
-		$page = ($page < 1) ? 1 : $page;
+            if ($iaCore->get('portfolio_disable_columns')) {
+                unset($iaCore->iaView->blocks['left'], $iaCore->iaView->blocks['right']);
+            }
 
-		$pageUrl = $iaCore->factory('page', iaCore::FRONT)->getUrlByName('portfolio');
+            $iaView->display('index');
+            break;
 
-		$pagination = array(
-			'start' => ($page - 1) * $iaCore->get('portfolio_entries_per_page'),
-			'limit' => (int)$iaCore->get('portfolio_entries_per_page'),
-			'template' => $pageUrl . '?page={page}'
-		);
+        case 'category':
+            $iaCategory = $iaCore->factoryModule('categories', 'portfolio');
+            $title_alias = implode('/', $iaView->url);
 
-		$order = ('date' == $iaCore->get('portfolio_entries_order')) ? 'ORDER BY `date_added` DESC' : 'ORDER BY `title` ASC';
+            $category = $iaCategory->getOne("`title_alias` = '{$title_alias}'");
 
-		$stmt = '`status` = :status AND `lang` = :language';
-		$iaDb->bind($stmt, array('status' => iaCore::STATUS_ACTIVE, 'language' => $iaView->language));
-		$rows = $iaDb->all('SQL_CALC_FOUND_ROWS `id`, `title`, `date_added`, `body`, `alias`, `image`', $stmt . ' ' . $order, $pagination['start'], $pagination['limit']);
-		$pagination['total'] = $iaDb->foundRows();
+            if (!$category) {
+                return iaView::errorPage(iaView::ERROR_NOT_FOUND);
+            }
 
-		$iaView->assign('tags', $iaPortfolio->getAllTags());
-		$iaView->assign('portfolio_entries', $rows);
-		$iaView->assign('pagination', $pagination);
-	}
+            $pagination = [
+                'total' => 0,
+                'limit' => (int)$iaCore->get('portfolio_entries_per_page'),
+                'url' => $iaCore->factory('page', iaCore::FRONT)->getUrlByName('portfolio') . $title_alias . '/?page={page}'
+            ];
 
-	$iaView->display('index');
+            $page = max(1, isset($_GET['page']) ? (int)$_GET['page'] : 1);
+            $start = ($page - 1) * $pagination['limit'];
+
+            $categoryParents = $iaCategory->getParents($category['id']);
+            $categoryChildren = $iaCategory->getChildren($category['id']);
+            $categoryIds = [$category['id']];
+
+            if ($iaCore->get('portfolio_show_children_entries') && !empty($categoryChildren)) {
+                foreach ($categoryChildren as $row) {
+                    $categoryIds[] = $row['id'];
+                }
+            }
+
+            foreach ($categoryParents as $row) {
+                if ($row['id'] !== $category['id']) {
+                    iaBreadcrumb::toEnd($row['title'], IA_URL . 'portfolio/' . $row['title_alias']);
+                }
+            }
+
+            $where = 'p.`category_id` IN (' . implode(',', $categoryIds) . ')';
+            $rows = $iaPortfolio->getAll($where, iaDb::ALL_COLUMNS_SELECTION, $start, $pagination['limit']);
+
+            $pagination['total'] = $iaPortfolio->getFoundRows();
+
+            iaBreadcrumb::toEnd($category['title'], IA_SELF);
+
+            $iaView->title(iaSanitize::tags($category['title']));
+
+            $iaView->assign('entries', $rows);
+            $iaView->assign('categories', $categoryChildren);
+            $iaView->assign('pagination', $pagination);
+
+            if ($iaCore->get('portfolio_disable_columns')) {
+                unset($iaCore->iaView->blocks['left'], $iaCore->iaView->blocks['right']);
+            }
+
+            $iaView->display('category');
+            break;
+
+        default:
+            $id = (int)end($iaCore->requestPath);
+
+            $entry = $iaPortfolio->getById($id);
+
+            if (!$entry) {
+                return iaView::errorPage(iaView::ERROR_NOT_FOUND);
+            }
+
+            $iaCategory = $iaCore->factoryModule('categories', 'portfolio');
+
+            $openGraph = [
+                'title' => $entry['title'],
+                'description' => iaSanitize::tags($entry['body'])
+            ];
+
+            $entry['gallery'] && $openGraph['image'] = IA_CLEAR_URL . 'uploads/' . $entry['gallery'][0]['path'] . 'large/' . $entry['gallery'][0]['file'];
+
+            $categoryParents = $iaCategory->getParents($entry['category_id']);
+
+            foreach ($categoryParents as $row) {
+                iaBreadcrumb::toEnd($row['title'], IA_URL . 'portfolio/' . $row['title_alias']);
+            }
+
+            iaBreadcrumb::toEnd($entry['title'], IA_SELF);
+
+            $iaView->set('og', $openGraph);
+            $iaView->title(iaSanitize::tags($entry['title']));
+
+            $iaView->assign('entry', $entry);
+            $iaView->assign('category', $iaCategory->getById($entry['category_id']));
+
+            $iaView->display('view');
+    }
 }
-
-$iaDb->resetTable();

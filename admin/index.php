@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Subrion - open source content management system
- * Copyright (C) 2016 Intelliants, LLC <http://www.intelliants.com>
+ * Copyright (C) 2017 Intelliants, LLC <https://intelliants.com>
  *
  * This file is part of Subrion.
  *
@@ -20,242 +20,158 @@
  * along with Subrion. If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * @link http://www.subrion.org/
+ * @link https://subrion.org/
  *
  ******************************************************************************/
 
 class iaBackendController extends iaAbstractControllerModuleBackend
 {
-	protected $_name = 'portfolio';
-	protected $_table = 'portfolio_entries';
-	protected $_tablePortfolioTags = 'portfolio_tags';
-	protected $_tablePortfolioEntriesTags = 'portfolio_entries_tags';
+    protected $_name = 'portfolio';
 
-	protected $_pluginName = 'portfolio';
+    protected $_itemName = 'portfolio';
 
-	protected $_gridColumns = array('title', 'alias', 'date_added', 'status');
-	protected $_gridFilters = array('status' => 'equal');
+    protected $_helperName = 'portfolio';
 
-	protected $_phraseAddSuccess = 'pf_added';
-	protected $_phraseGridEntryDeleted = 'pf_deleted';
+    protected $_gridFilters = ['status' => self::EQUAL];
+    protected $_gridSorting = [
+        'category' => ['title', 'cat'],
+        'member' => ['fullname', 'm'],
+    ];
+
+    protected $_tooltipsEnabled = true;
+
+    protected $_activityLog = ['item' => 'portfolio'];
+
+    protected $_iaCategories;
 
 
-	public function __construct()
-	{
-		parent::__construct();
+    public function init()
+    {
+        $this->_iaCategories = $this->_iaCore->factoryModule('categories', $this->getName(), iaCore::ADMIN);
+        $this->_path = IA_ADMIN_URL . $this->getName() . IA_URL_DELIMITER;
+    }
 
-		$iaPortfolio = $this->_iaCore->factoryPlugin($this->getModuleName(), iaCore::ADMIN, $this->getName());
-		$this->setHelper($iaPortfolio);
-	}
+    protected function _indexPage(&$iaView)
+    {
+        parent::_indexPage($iaView);
 
-	protected function _modifyGridParams(&$conditions, &$values)
-	{
-		if (!empty($_GET['text']))
-		{
-			$conditions[] = '(`title` LIKE :text OR `body` LIKE :text)';
-			$values['text'] = '%' . iaSanitize::sql($_GET['text']) . '%';
-		}
-	}
+        $iaView->add_css('_IA_URL_modules/fancybox/js/jquery.fancybox');
+        $iaView->add_js('_IA_URL_modules/fancybox/js/jquery.fancybox.pack');
+    }
 
-	protected function _gridRead($params)
-	{
-		return (isset($params['get']) && 'alias' == $params['get'])
-			? array('url' => IA_URL . 'portfolio' . IA_URL_DELIMITER . $this->_iaDb->getNextId() . '-' . $this->getHelper()->titleAlias($params['title']))
-			: parent::_gridRead($params);
-	}
+    protected function _gridQuery($columns, $where, $order, $start, $limit)
+    {
+        $sql = <<<SQL
+SELECT SQL_CALC_FOUND_ROWS p.`id`, p.`title_:lang` `title`, p.`gallery`, p.`title_alias`, p.`date_added`, p.`order`, p.`status`,
+  cat.`title_:lang` `category`, m.`fullname` `member`, 1 `update`, 1 `delete`
+  FROM `:prefix:table_portfolio` p
+LEFT JOIN `:prefix:table_categories` cat ON (cat.`id` = p.`category_id`)
+LEFT JOIN `:prefix:table_members` m ON (m.`id` = p.`member_id`)
+:where
+LIMIT :start, :limit
+SQL;
+        $sql = iaDb::printf($sql, [
+            'prefix' => $this->_iaDb->prefix,
+            'table_portfolio' => $this->getTable(),
+            'table_categories' => iaCategories::getTable(),
+            'table_members' => iaUsers::getTable(),
+            'lang' => $this->_iaCore->language['iso'],
+            'where' => ($where ? 'WHERE ' . $where . ' ' : '') . $order . ' ',
+            'start' => $start,
+            'limit' => $limit
+        ]);
 
-	protected function _setPageTitle(&$iaView)
-	{
-		if (in_array($iaView->get('action'), array(iaCore::ACTION_ADD, iaCore::ACTION_EDIT)))
-		{
-			$iaView->title(iaLanguage::get('pf_' . $iaView->get('action')));
-		}
-	}
+        return $this->_iaDb->getAll($sql);
+    }
 
-	protected function _setDefaultValues(array &$entry)
-	{
-		$entry['title'] = $entry['body'] = $entry['tags'] = '';
-		$entry['lang'] = $this->_iaCore->iaView->language;
-		$entry['date_added'] = date(iaDb::DATETIME_FORMAT);
-		$entry['status'] = iaCore::STATUS_ACTIVE;
-	}
+    protected function _modifyGridResult(array &$entries)
+    {
+        foreach ($entries as &$entry) {
+            $entry['type'] = iaField::getLanguageValue($this->getItemName(), 'type', $entry['type']);
 
-	protected function _entryDelete($entryId)
-	{
-		return (bool)$this->getHelper()->delete($entryId);
-	}
+            $images = [];
 
-	protected function _preSaveEntry(array &$entry, array $data, $action)
-	{
-		parent::_preSaveEntry($entry, $data, $action);
+            if ($gallery = unserialize($entry['gallery'])) {
+                foreach ($gallery as $image) {
+                    $images[] = [
+                        'href' => $this->_iaCore->iaView->assetsUrl . 'uploads/' . $image['path'] . 'large/' .  $image['file'],
+                        'title' => $image['title']
+                    ];
+                }
+            }
 
-		iaUtil::loadUTF8Functions('ascii', 'validation', 'bad', 'utf8_to_ascii');
+            $entry['gallery'] = $images;
+        }
+    }
 
-		if (!utf8_is_valid($entry['title']))
-		{
-			$entry['title'] = utf8_bad_replace($entry['title']);
-		}
+    protected function _setDefaultValues(array &$entry)
+    {
+        $entry = [
+            'status' => iaCore::STATUS_ACTIVE,
+            'member_id' => iaUsers::getIdentity()->id,
+        ];
+    }
 
-		if (empty($entry['title']))
-		{
-			$this->addMessage('title_is_empty');
-		}
+    protected function _assignValues(&$iaView, array &$entryData)
+    {
+        parent::_assignValues($iaView, $entryData);
 
-		if (!utf8_is_valid($entry['body']))
-		{
-			$entry['body'] = utf8_bad_replace($entry['body']);
-		}
+        $iaView->assign('categoryTree', $this->_getCategoryTreeVars($entryData));
+    }
 
-		if (empty($entry['body']))
-		{
-			$this->addMessage(iaLanguage::getf('field_is_empty', array('field' => iaLanguage::get('description'))), false);
-		}
+    private function _getCategoryTreeVars(array $entryData)
+    {
+        $category = empty($entryData['category_id'])
+            ? $this->_iaCategories->getRoot()
+            : $this->_iaCategories->getById($entryData['category_id']);
 
-		if (empty($entry['date_added']))
-		{
-			$entry['date_added'] = date(iaDb::DATETIME_FORMAT);
-		}
+        $nodes = array_merge([$this->_iaCategories->getRootId()], $this->_iaCategories->getParents($category['id'], true));
 
-		$entry['alias'] = $this->getHelper()->titleAlias(empty($entry['alias']) ? $entry['title'] : $entry['alias']);
+        return [
+            'url' => IA_ADMIN_URL . $this->getName() . '/categories/tree.json?noroot',
+            'nodes' => implode(',', $nodes),
+            'id' => $category['id'],
+            'title' => $category['title']
+        ];
+    }
 
-		if (isset($_FILES['image']['tmp_name']) && $_FILES['image']['tmp_name'])
-		{
-			$this->_iaCore->loadClass(iaCore::CORE, 'picture');
+    protected function _getJsonSlug(array $params)
+    {
+        $category = $this->_iaCategories->getById((int)$_GET['category']);
 
-			$iaImage = $this->_iaCore->factoryPlugin($this->getModuleName(), iaCore::ADMIN, 'image');
+        $alias = $this->getHelper()->titleAlias($params['title'], $category['title_alias']);
 
-			$imageData = json_decode($entry['image-data'], true);
-			$path = iaUtil::getAccountDir();
-			$file = $_FILES['image'];
-			$token = iaUtil::generateToken();
-			$info = array(
-				'image_width' => $this->_iaCore->get('portfolio_image_width'),
-				'image_height' => $this->_iaCore->get('portfolio_image_height'),
-				'crop_width' => $imageData['width'],
-				'crop_height' => $imageData['height'],
-				'thumb_width' => $this->_iaCore->get('portfolio_thumbnail_width'),
-				'thumb_height' => $this->_iaCore->get('portfolio_thumbnail_height'),
-				'positionX' => $imageData['x'],
-				'positionY' => $imageData['y'],
-				'position' => 'LT',
-				'resize' => 'after_crop',
-				'resize_mode' => iaImage::CROP
-			);
+        return ['data' => $alias];
+    }
 
-			if ($image = $iaImage->processFolioImage($file, $path, $token, $info))
-			{
-				if ($entry['image']) // it has an already assigned image
-				{
-					$iaImage = $this->_iaCore->factory('picture');
-					$iaImage->delete($entry['image']);
-				}
+    protected function _preSaveEntry(array &$entry, array $data, $action)
+    {
+        parent::_preSaveEntry($entry, $data, $action);
 
-				$entry['image'] = $image;
-			}
-		}
+        if (empty($data['tree_id'])) {
+            $this->addMessage('invalid_category');
+        } else {
+            $entry['category_id'] = (int)$data['tree_id'];
+        }
 
-		if (empty($entry['image']))
-		{
-			$this->addMessage('invalid_image_file');
-		}
+        $entry['title_alias'] = empty($data['title_alias']) ? $data['title'][$this->_iaCore->language['iso']] : $data['title_alias'];
+        $entry['title_alias'] = $this->getHelper()->titleAlias($entry['title_alias']);
 
-		if ($this->getMessages())
-		{
-			return false;
-		}
+        return !$this->getMessages();
+    }
 
-		unset($entry['image-src'], $entry['image-data'], $entry['tags']);
+    protected function _entryAdd(array $entryData)
+    {
+        $entryData['date_added'] = date(iaDb::DATETIME_FORMAT);
+        $entryData['date_modified'] = date(iaDb::DATETIME_FORMAT);
 
-		return true;
-	}
+        return parent::_entryAdd($entryData);
+    }
 
-	protected function _postSaveEntry(array &$entry, array $data, $action)
-	{
-		$iaLog = $this->_iaCore->factory('log');
+    protected function _entryUpdate(array $entryData, $entryId)
+    {
+        $entryData['date_modified'] = date(iaDb::DATETIME_FORMAT);
 
-		$actionCode = (iaCore::ACTION_ADD == $action)
-			? iaLog::ACTION_CREATE
-			: iaLog::ACTION_UPDATE;
-		$params = array(
-			'module' => 'portfolio',
-			'item' => 'portfolio',
-			'name' => $entry['title'],
-			'id' => $this->getEntryId()
-		);
-
-		$iaLog->write($actionCode, $params);
-
-		$this->_saveTags($data['tags']);
-	}
-
-	protected function _saveTags($tagsString)
-	{
-		$tags = array_filter(explode(',', $tagsString));
-
-		$this->_iaDb->setTable($this->_tablePortfolioEntriesTags);
-
-		$sql ='DELETE ' .
-			'FROM `:prefix:table_portfolio_tags` ' .
-			'WHERE `id` IN (' .
-			'SELECT DISTINCT `tag_id` ' .
-			'FROM `:prefix:table_portfolio_entries_tags` ' .
-			'WHERE `tag_id` IN (' .
-			'SELECT DISTINCT `tag_id` FROM `:prefix:table_portfolio_entries_tags` ' .
-			'WHERE `portfolio_id` = :id) ' .
-			'GROUP BY 1 ' .
-			'HAVING COUNT(*) = 1)';
-
-		$sql = iaDb::printf($sql, array(
-			'prefix' => $this->_iaDb->prefix,
-			'table_portfolio_tags' => $this->_tablePortfolioTags,
-			'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
-			'id' => $this->getEntryId()
-		));
-
-		$this->_iaDb->query($sql);
-		$sql =
-			'DELETE ' .
-			'FROM :prefix:table_portfolio_entries_tags ' .
-			'WHERE `portfolio_id` = :id';
-		$sql = iaDb::printf($sql, array(
-			'prefix' => $this->_iaDb->prefix,
-			'table_portfolio_entries_tags' => $this->_tablePortfolioEntriesTags,
-			'id' => $this->getEntryId()
-		));
-
-		$this->_iaDb->query($sql);
-
-		$allTagTitles = $this->_iaDb->keyvalue(array('title','id'), null, $this->_tablePortfolioTags);
-
-		foreach ($tags as $tag)
-		{
-			$tagAlias = iaSanitize::alias(strtolower($tag));
-			$tagEntry = array(
-				'title' => $tag,
-				'alias' => $tagAlias
-			);
-			$tagId = isset($allTagTitles[$tag])
-				? $allTagTitles[$tag]
-				: $this->_iaDb->insert($tagEntry, null, $this->_tablePortfolioTags);
-
-			$tagPortfolioIds = array(
-				'portfolio_id' => $this->getEntryId(),
-				'tag_id' => $tagId
-			);
-
-			$this->_iaDb->insert($tagPortfolioIds);
-		}
-	}
-
-	protected function _assignValues(&$iaView, array &$entryData)
-	{
-		if ($this->getEntryId())
-		{
-			$entryData['tags'] = $this->getHelper()->getTags($this->getEntryId());
-		}
-		else if (isset($_POST['tags']))
-		{
-			$entryData['tags'] = iaSanitize::sql($_POST['tags']);
-		}
-	}
+        return parent::_entryUpdate($entryData, $entryId);
+    }
 }

@@ -1,143 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
 <module type="plugin" name="portfolio">
-	<title>Portfolio</title>
-	<summary>Allows to create a portfolio section</summary>
-	<author>Intelliants LLC</author>
-	<contributor>Intelliants LLC</contributor>
-	<version>4.0.1</version>
-	<date>2016-02-08</date>
-	<compatibility>4.0</compatibility>
+    <title>Portfolio</title>
+    <summary>Allows to create a portfolio section</summary>
+    <author>Intelliants LLC</author>
+    <contributor>Intelliants LLC</contributor>
+    <version>4.1.0</version>
+    <date>2017-08-09</date>
+    <compatibility>4.1</compatibility>
 
-	<actions>
-		<action name="portfolio" url="portfolio/" icon="list" pages="portfolio:add,portfolio:edit">List</action>
-		<action name="portfolio_add" url="portfolio/add/" icon="plus" pages="portfolio:read,portfolio:edit">Add portfolio entry</action>
-		<action type="dashboard" name="dashboard_portfolio_add" url="portfolio/add/" icon="plus">New portfolio entry</action>
-	</actions>
+    <items>
+        <item payable="0">portfolio</item>
+        <item payable="0">portfolio_categs</item>
+    </items>
 
-	<adminpages>
-		<page group="content" name="portfolio" order="60" url="portfolio/" menus="menu">Portfolio</page>
-	</adminpages>
+    <actions>
+        <action name="portfolio" url="portfolio/" icon="list" pages="portfolio:add,portfolio:edit,categories:read,categories:add">List</action>
+        <action name="add_portfolio" url="portfolio/add/" icon="plus" pages="portfolio:read,portfolio:edit,categories:read,categories:add">Add portfolio entry</action>
 
-	<pages>
-		<page menus="main" name="portfolio" url="portfolio/">Portfolio</page>
-		<page name="portfolio_tag" url="portfolio/tag/" filename="tag">Portfolio Tags</page>
-	</pages>
+        <action name="categories_list" url="portfolio/categories/" icon="folder" pages="categories:add,categories:edit,portfolio:add,portfolio:read">View Categories</action>
+        <action name="categories_add" url="portfolio/categories/add/" icon="folder-plus"  pages="categories:read,categories:edit,portfolio:add,portfolio:read">Add Category</action>
+    </actions>
 
-	<phrases>
-		<phrase category="admin" key="pf_entries">Portfolio</phrase>
-		<phrase category="admin" key="pf_add">Add portfolio entry</phrase>
-		<phrase category="admin" key="pf_edit">Edit portfolio entry</phrase>
-		<phrase category="admin" key="pf_body">Description of your work</phrase>
-		<phrase category="admin" key="pf_tags">Tags</phrase>
-		<phrase category="admin" key="pf_tags_help">Separate tags with comma</phrase>
-		<phrase category="admin" key="pf_image">Image</phrase>
-		<phrase category="admin" key="pf_added">Your work added!</phrase>
-		<phrase category="admin" key="pf_deleted">Your work removed! =(</phrase>
+    <adminpages>
+        <page group="content" name="portfolio" url="portfolio/" menus="menu">Portfolio</page>
+        <page group="content" filename="categories" name="categories" url="portfolio/categories/">Categories</page>
+    </adminpages>
 
-		<phrase category="frontend" key="pf_view_all">View all</phrase>
-		<phrase category="frontend" key="pf_no_entries">Nothing to show right now. Content coming soon!</phrase>
-	</phrases>
+    <pages>
+        <page menus="main" name="portfolio" url="portfolio/">Portfolio</page>
+    </pages>
 
-	<configgroup name="portfolio">Portfolio</configgroup>
+    <fields_groups>
+        <group item="portfolio" name="general" title="General"><![CDATA[]]></group>
+        <group item="portfolio_categs" name="general" title="General"><![CDATA[]]></group>
+    </fields_groups>
 
-	<config group="portfolio" name="portfolio_page" type="divider">Portfolio page</config>
-	<config group="portfolio" name="portfolio_disable_columns" type="radio" values="1,0" description="Disable left and right columns on portfolio page">0</config>
-	<config group="portfolio" name="portfolio_entries_per_page" type="text" description="Number of displayed entries per page">20</config>
-	<config group="portfolio" name="portfolio_desc_length" type="text" description="Number of chars in description">100</config>
-	<config group="portfolio" name="portfolio_entries_order" type="select" values="alphabetic,date" description="Entries order by">date</config>
+    <fields>
+        <field name="title" item="portfolio" type="text" group="general" length="70" required="1" multilingual="1">Title</field>
+        <field name="body" item="portfolio" type="textarea" group="general" editor="1" multilingual="1" adminonly="1">Body</field>
+        <field name="gallery" item="portfolio" type="pictures" group="general" thumb_width="400" thumb_height="400" width="800" height="400" prefix="pf_" length="5" adminonly="1">Pictures</field>
 
-	<config group="portfolio" name="portfolio_block" type="divider">New Portfolio entries block</config>
-	<config group="portfolio" name="portfolio_block_count" type="text" description="Number of displayed works">4</config>
+        <field name="title" item="portfolio_categs" type="text" group="general" length="70" required="1" multilingual="1" adminonly="1">Title</field>
+    </fields>
 
-	<config group="portfolio" name="portfolio_images" type="divider">Images</config>
-	<config group="portfolio" name="portfolio_use_crop" type="radio" values="1,0" description="Use cropper for thumbnails">1</config>
-	<config group="portfolio" name="portfolio_image_width" type="text" description="Resized image width">800</config>
-	<config group="portfolio" name="portfolio_image_height" type="text" description="Resized image height">600</config>
-	<config group="portfolio" name="portfolio_thumbnail_width" type="text" description="Thumbnail width" private="0">300</config>
-	<config group="portfolio" name="portfolio_thumbnail_height" type="text" description="Thumbnail height" private="0">300</config>
-	<config group="portfolio" name="tag_number" type="text" description="Number of displayed tags">10</config>
+    <phrases>
+        <phrase category="admin" key="are_you_sure_to_delete_this_categ">Are you sure you wish to delete this category and all subcategories?</phrase>
+        <phrase category="admin" key="are_you_sure_to_delete_selected_categs">Are you sure you wish to delete these categories? Subcategories will be removed as well.</phrase>
+        <phrase category="admin" key="are_you_sure_to_delete_selected_entries">Are you sure you wish to delete these entries?</phrase>
+        <phrase category="admin" key="are_you_sure_to_delete_entry">Are you sure you wish to delete this entry?</phrase>
+        <phrase category="admin" key="entries">Entries</phrase>
+        <phrase category="admin" key="total_entries">Total entries</phrase>
+        <phrase category="admin" key="add_portfolio">Add Entry</phrase>
+        <phrase category="admin" key="edit_portfolio">Edit Portfolio</phrase>
+        <phrase category="admin" key="portfolio_added">Entry added.</phrase>
+        <phrase category="admin" key="recount_portfolio_entries">Recount portfolio entries</phrase>
+        <phrase category="admin" key="category_already_exists">Category already exists.</phrase>
 
-	<blocks>
-		<block title="Portfolio tags" name="portfolio_tags" position="left" type="smarty" sticky="0" pages="portfolio" filename="block.portfolio-tags"><![CDATA[]]></block>
-		<block title="New Portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="0" pages="index" classname="pf" order="5" filename="block.new-portfolio-entries"><![CDATA[]]></block>
-	</blocks>
+        <phrase category="common" key="portfolio">Portfolio</phrase>
 
-	<hooks>
-		<hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load"><![CDATA[]]></hook>
-		<hook name="adminDashboardStatistics" page_type="admin" pages="index"><![CDATA[$items['portfolio:portfolios'] = 'plugin';]]></hook>
-		<hook name="sitemapGeneration" page_type="admin" pages="index"><![CDATA[$items[] = 'portfolio:portfolio';]]></hook>
-	</hooks>
+        <phrase category="frontend" key="no_portfolio_entries">Administrator has not posted any works.</phrase>
+        <phrase category="frontend" key="no_portfolio_entries_in_category">Administrator has not posted any works in this category.</phrase>
+        <phrase category="frontend" key="view_all_portfolio_entries">View all portfolio entries</phrase>
+    </phrases>
 
-	<install>
-		<sql>
-			<![CDATA[
-CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries` (
-	`id` smallint(5) unsigned NOT NULL auto_increment,
-	`title` tinytext NOT NULL,
-	`alias` varchar(155) NOT NULL,
-	`body` text NOT NULL,
-	`date_added` date NOT NULL,
-	`image` tinytext NOT NULL,
-	`status` enum('inactive','active') NOT NULL default 'inactive',
-	`lang` char(2) NOT NULL,
-	PRIMARY KEY (`id`),
-	KEY `LANGUAGE` (`lang`),
-	FULLTEXT KEY `SEARCH` (`title`, `body`)
+    <configgroup name="portfolio">Portfolio</configgroup>
+
+    <config group="portfolio" name="portfolio_page" type="divider">Portfolio page</config>
+    <config group="portfolio" name="portfolio_disable_columns" type="radio" values="1,0" description="Disable left and right columns on portfolio page">0</config>
+    <config group="portfolio" name="portfolio_entries_per_page" type="text" description="Number of displayed entries per page">20</config>
+    <config group="portfolio" name="portfolio_entries_order" type="select" values="Alphabetic,Date,Order" description="Entries order by">Date</config>
+    <config group="portfolio" name="portfolio_entries_direction" type="select" values="Ascending,Descending" description="Entries direction">Descending</config>
+
+    <config group="portfolio" name="portfolio_new_entries_block" type="divider">New Portfolio entries block</config>
+    <config group="portfolio" name="portfolio_block_count" type="text" description="Number of displayed entries">20</config>
+
+    <config group="portfolio" name="portfolio_top_categories_block" type="divider">Top Categories block</config>
+    <config group="portfolio" name="portfolio_show_counter" values="1,0" type="radio" description="Show counter">0</config>
+
+    <config group="portfolio" name="portfolio_contents" type="divider">Contents</config>
+    <config group="portfolio" name="portfolio_show_children_entries" values="1,0" type="radio" description="Show entries from subcategories">1</config>
+
+    <blocks>
+        <block title="Top portfolio categories" name="top_portfolio_categories" position="left" type="smarty" sticky="1" classname="top-portfolio-categories" filename="block.top-portfolio-categories"><![CDATA[]]></block>
+        <block title="New portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="1" pages="portfolio" classname="new-portfolio-entries" filename="block.new-portfolio-entries"><![CDATA[]]></block>
+    </blocks>
+
+    <hooks>
+        <hook name="adminDatabaseConsistency" type="smarty" page_type="admin" filename="hook.db-consistency"><![CDATA[]]></hook>
+        <hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load"><![CDATA[]]></hook>
+    </hooks>
+
+    <install>
+        <sql>
+            <![CDATA[
+CREATE TABLE IF NOT EXISTS `{prefix}portfolio` (
+    `id` mediumint(7) unsigned NOT NULL auto_increment,
+    `member_id` int(11) unsigned NOT NULL,
+    `category_id` int(8) unsigned NOT NULL,
+    `title_alias` varchar(150) NOT NULL,
+    `date_added` datetime,
+    `date_modified` datetime,
+    `status` enum('inactive', 'active') NOT NULL default 'active',
+    `order` smallint(5) unsigned NOT NULL,
+    PRIMARY KEY  (`id`),
+    KEY `CATEGORY` (`category_id`),
+    KEY `ORDER` (`order`),
+    KEY `SLUG` (`title_alias`),
+    KEY `DATE` (`date_added`)
 ) {mysql_version};
-			]]>
-		</sql>
-		<sql>
-			<![CDATA[
-CREATE TABLE IF NOT EXISTS `{prefix}portfolio_tags` (
-	`id` mediumint(8) unsigned NOT NULL auto_increment,
-	`title` varchar(50) NOT NULL,
-	`alias` varchar(50) NOT NULL,
-	PRIMARY KEY (`id`)
+            ]]>
+        </sql>
+        <sql>
+            <![CDATA[
+CREATE TABLE IF NOT EXISTS `{prefix}portfolio_categs` (
+    `id` int(8) unsigned NOT NULL auto_increment,
+    `title_alias` varchar(150) NOT NULL,
+    `status` enum('inactive', 'active') NOT NULL default 'active',
+    `order` int(8) unsigned NOT NULL,
+    `views_num` mediumint(8) unsigned NOT NULL,
+    `no_follow` tinyint(1) unsigned NOT NULL,
+    `locked` tinyint(1) unsigned NOT NULL,
+    PRIMARY KEY (`id`),
+    KEY `VIEWS` (`views_num`),
+    KEY `SLUG` (`title_alias`),
+    KEY `ORDER` (`order`)
 ) {mysql_version};
-			]]>
-		</sql>
-		<sql>
-			<![CDATA[
-CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries_tags` (
-	`portfolio_id` mediumint(8) unsigned NOT NULL,
-	`tag_id` mediumint(8) unsigned NOT NULL,
-	UNIQUE KEY `UNIQUE` (`tag_id`, `portfolio_id`)
-) {mysql_version};
-			]]>
-		</sql>
-	</install>
+            ]]>
+        </sql>
+        <code>
+            <![CDATA[
+$iaCore->factoryModule('categories', 'portfolio', iaCore::ADMIN)->setupDbStructure();
+            ]]>
+        </code>
+    </install>
 
-	<uninstall>
-		<sql>
-			<![CDATA[
-DROP TABLE IF EXISTS `{prefix}portfolio_entries`, `{prefix}portfolio_tags`, `{prefix}portfolio_entries_tags`;
-			]]>
-		</sql>
-	</uninstall>
-
-	<upgrade>
-		<sql version="4.0.1">
-			<![CDATA[
-ALTER TABLE `{prefix}portfolio_entries` DROP `tags`;
-			]]>
-		</sql>
-		<sql version="4.0.1">
-			<![CDATA[
-CREATE TABLE IF NOT EXISTS `{prefix}portfolio_tags` (
-	`id` mediumint(8) unsigned NOT NULL auto_increment,
-	`title` varchar(50) NOT NULL,
-	`alias` varchar(50) NOT NULL,
-	PRIMARY KEY (`id`)
-) {mysql_version};
-			]]>
-		</sql>
-		<sql version="4.0.1">
-			<![CDATA[
-CREATE TABLE IF NOT EXISTS `{prefix}portfolio_entries_tags` (
-	`portfolio_id` mediumint(8) unsigned NOT NULL,
-	`tag_id` mediumint(8) unsigned NOT NULL,
-	UNIQUE KEY `UNIQUE` (`tag_id`, `portfolio_id`)
-) {mysql_version};
-			]]>
-	</upgrade>
+    <uninstall>
+        <sql>
+            <![CDATA[
+DROP TABLE IF EXISTS `{prefix}portfolio`, `{prefix}portfolio_categs`, `{prefix}portfolio_categs_flat`;
+            ]]>
+        </sql>
+    </uninstall>
 </module>
