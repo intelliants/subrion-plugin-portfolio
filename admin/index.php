@@ -139,9 +139,33 @@ SQL;
     {
         $category = $this->_iaCategories->getById((int)$_GET['category']);
 
-        $alias = $this->getHelper()->titleAlias($params['title'], $category['title_alias']);
+        $alias = IA_URL . 'portfolio/';
+
+        if (!empty($params['title'])) {
+            $alias = $this->getHelper()->titleAlias($params['title'], $category['title_alias']);
+        }
 
         return ['data' => $alias];
+    }
+
+    public function updateCounters($entryId, array $entryData, $action, $previousData = null)
+    {
+        $newStatus = $entryData['status'];
+        $oldStatus = $previousData ? $previousData['status'] : $newStatus;
+
+        if ((iaCore::ACTION_DELETE == $action && iaCore::STATUS_ACTIVE == $newStatus)
+            || (iaCore::STATUS_ACTIVE == $oldStatus && iaCore::STATUS_ACTIVE != $newStatus)) {
+            $diff = -1;
+        } elseif ((iaCore::STATUS_ACTIVE == $newStatus && iaCore::STATUS_ACTIVE != $oldStatus) || iaCore::ACTION_ADD == $action) {
+            $diff = 1;
+        } elseif ($previousData['category_id'] !== $entryData['category_id']) {
+            $this->_iaCategories->recountById($previousData['category_id'], -1);
+            $diff = 1;
+        }
+
+        if (isset($diff)) {
+            $this->_iaCategories->recountById($entryData['category_id'], $diff);
+        }
     }
 
     protected function _preSaveEntry(array &$entry, array $data, $action)

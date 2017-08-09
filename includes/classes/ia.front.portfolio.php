@@ -36,12 +36,14 @@ class iaPortfolio extends abstractModuleFront
     public $coreSearchEnabled = false;
 
     protected $_patterns = [
-        'view' => 'portfolio/:category_alias/:id-:title_alias.html'
+        'view' => 'portfolio/:category_alias:id-:title_alias.html'
     ];
 
 
     public function url($action, array $data)
     {
+        empty($data['category_alias']) || $data['category_alias'].= IA_URL_DELIMITER;
+
         return IA_URL . iaDb::printf($this->_patterns[$action], $data);
     }
 
@@ -52,7 +54,7 @@ class iaPortfolio extends abstractModuleFront
 
     public function getById($id, $process = true)
     {
-        $row = $this->_getQuery('p.`id` = ' . (int)$id, '', 1, 0, false);
+        $row = $this->_getQuery('p.`id` = ' . (int)$id, '', 1, 0, false, true);
         $row && $row = array_shift($row);
 
         $process && $this->_processValues($row, true);
@@ -91,7 +93,7 @@ class iaPortfolio extends abstractModuleFront
         return $rows;
     }
 
-    protected function _getQuery($aWhere = '', $aOrder = '', $limit = null, $start = null, $foundRows = false)
+    protected function _getQuery($aWhere = '', $aOrder = '', $limit = null, $start = null, $foundRows = false, $singleRow = false)
     {
         $sql = <<<SQL
 SELECT :found_rows :fields
@@ -141,7 +143,7 @@ SQL;
             $this->_foundRows = $this->iaDb->getOne(iaDb::printf($sql, $data));
         }
 
-        $this->_processValues($rows, 1 == $limit);
+        $this->_processValues($rows, $singleRow);
 
         return $rows;
     }

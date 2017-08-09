@@ -31,9 +31,9 @@ if (iaView::REQUEST_HTML == $iaView->getRequestType()) {
 
     array_shift($iaView->url);
 
-    if ((int)end($iaView->url) && count($iaView->url) > 1) {
+    if ((int)end($iaView->url)) {
         $page = 'view';
-    } elseif (count($iaView->url) > 0) {
+    } elseif (!empty($iaView->url)) {
         $page = 'category';
     }
 

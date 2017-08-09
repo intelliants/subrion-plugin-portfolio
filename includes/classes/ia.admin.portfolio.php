@@ -45,7 +45,7 @@ class iaPortfolio extends abstractModuleAdmin
 
         empty($categoryAlias) || $alias = $categoryAlias . IA_URL_DELIMITER . $alias;
 
-        $baseUrl = $this->getInfo('url');
+        $baseUrl = $this->getInfo('url') . 'portfolio/';
 
         return $baseUrl . $alias . '.html';
     }

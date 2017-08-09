@@ -75,10 +75,10 @@
     <config group="portfolio" name="portfolio_block_count" type="text" description="Number of displayed entries">20</config>
 
     <config group="portfolio" name="portfolio_top_categories_block" type="divider">Top Categories block</config>
-    <config group="portfolio" name="portfolio_show_counter" values="1,0" type="radio" description="Show counter">0</config>
+    <config group="portfolio" name="portfolio_show_counter" values="1,0" type="radio" description="Show counter">1</config>
 
     <config group="portfolio" name="portfolio_contents" type="divider">Contents</config>
-    <config group="portfolio" name="portfolio_show_children_entries" values="1,0" type="radio" description="Show entries from subcategories">1</config>
+    <config group="portfolio" name="portfolio_show_children_entries" values="1,0" type="radio" description="Show entries from subcategories on View Category pages">1</config>
 
     <blocks>
         <block title="Top portfolio categories" name="top_portfolio_categories" position="left" type="smarty" sticky="1" classname="top-portfolio-categories" filename="block.top-portfolio-categories"><![CDATA[]]></block>

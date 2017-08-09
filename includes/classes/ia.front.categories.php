@@ -36,8 +36,11 @@ class iaCategories extends iaAbstractFrontHelperCategoryFlat
         'view' => 'portfolio/:title_alias'
     ];
 
+
     public function url($action, array $data)
     {
-        return IA_URL . iaDb::printf($this->_patterns[$action], $data) . IA_URL_DELIMITER;
+        empty($data['title_alias']) || $data['title_alias'].= IA_URL_DELIMITER;
+
+        return IA_URL . iaDb::printf($this->_patterns[$action], $data);
     }
 }
