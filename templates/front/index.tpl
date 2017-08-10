@@ -14,5 +14,5 @@
 
     {navigation aTotal=$pagination.total aTemplate=$pagination.url aItemsPerPage=$pagination.limit aNumPageItems=5}
 {else}
-    <div class="alert alert-info">{lang key='pf_no_entries'}</div>
+    <div class="alert alert-info">{lang key='no_portfolio_entries'}</div>
 {/if}
