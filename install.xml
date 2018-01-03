@@ -9,7 +9,7 @@
     <compatibility>4.1</compatibility>
 
     <items>
-        <item payable="0">portfolio</item>
+        <item table_name="portfolio" payable="0">portfolio</item>
         <item payable="0">portfolio_categs</item>
     </items>
 
