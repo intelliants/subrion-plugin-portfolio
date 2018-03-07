@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Subrion - open source content management system
- * Copyright (C) 2017 Intelliants, LLC <https://intelliants.com>
+ * Copyright (C) 2018 Intelliants, LLC <https://intelliants.com>
  *
  * This file is part of Subrion.
  *
@@ -141,12 +141,14 @@ if (iaView::REQUEST_HTML == $iaView->getRequestType()) {
                 iaBreadcrumb::toEnd($row['title'], IA_URL . 'portfolio/' . $row['title_alias']);
             }
 
+
             iaBreadcrumb::toEnd($entry['title'], IA_SELF);
 
             $iaView->set('og', $openGraph);
             $iaView->title(iaSanitize::tags($entry['title']));
 
             $iaView->assign('entry', $entry);
+
             $iaView->assign('category', $iaCategory->getById($entry['category_id']));
 
             $iaView->display('view');

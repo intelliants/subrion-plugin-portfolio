@@ -4,13 +4,13 @@
     <summary>Allows to create a portfolio section</summary>
     <author>Intelliants LLC</author>
     <contributor>Intelliants LLC</contributor>
-    <version>4.1.0</version>
-    <date>2017-08-09</date>
-    <compatibility>4.1</compatibility>
+    <version>4.2.0</version>
+    <date>2018-03-07</date>
+    <compatibility>4.2</compatibility>
 
     <items>
         <item table_name="portfolio" payable="0">portfolio</item>
-        <item payable="0">portfolio_categs</item>
+        <item payable="0">portfolio_categ</item>
     </items>
 
     <actions>
@@ -81,13 +81,13 @@
     <config group="portfolio" name="portfolio_show_children_entries" values="1,0" type="radio" description="Show entries from subcategories on View Category pages">1</config>
 
     <blocks>
-        <block title="Top portfolio categories" name="top_portfolio_categories" position="left" type="smarty" sticky="1" classname="top-portfolio-categories" filename="block.top-portfolio-categories"><![CDATA[]]></block>
-        <block title="New portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="1" pages="portfolio" classname="new-portfolio-entries" filename="block.new-portfolio-entries"><![CDATA[]]></block>
+        <block title="Top portfolio categories" name="top_portfolio_categories" position="left" type="smarty" sticky="1" classname="top-portfolio-categories" filename="block.top-portfolio-categories.tpl"><![CDATA[]]></block>
+        <block title="New portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="1" pages="portfolio" classname="new-portfolio-entries" filename="block.new-portfolio-entries.tpl"><![CDATA[]]></block>
     </blocks>
 
     <hooks>
-        <hook name="adminDatabaseConsistency" type="smarty" page_type="admin" filename="hook.db-consistency"><![CDATA[]]></hook>
-        <hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load"><![CDATA[]]></hook>
+        <hook name="adminDatabaseConsistency" type="smarty" page_type="admin" filename="hook.db-consistency.php"><![CDATA[]]></hook>
+        <hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load.php"><![CDATA[]]></hook>
     </hooks>
 
     <install>

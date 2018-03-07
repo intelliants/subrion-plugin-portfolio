@@ -25,7 +25,7 @@
             {$entry.body}
         </div>
 
-        <p><span class="fa fa-folder-open"></span> <a href="{$category.link}">{$category.title|escape}</a></p>
+        <p><span class="fa fa-folder-open"></span> <a href="{$entry.item}/{$entry.category_alias}">{$category.title|escape}</a></p>
 
         <hr>
         <!-- AddThis Button BEGIN -->

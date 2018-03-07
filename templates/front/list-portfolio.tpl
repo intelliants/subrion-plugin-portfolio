@@ -8,7 +8,7 @@
 
         <div class="ia-item__content">
             <h4 class="ia-item__title text-center">
-                <a href="{$entry.link}">{$entry.title|escape}</a>
+                <a href="{$entry.item}/{$entry.category_alias}/{$entry.id}-{$entry.title_alias}.html">{$entry.title|escape}</a>
             </h4>
         </div>
     </div>
