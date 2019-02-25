@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Subrion - open source content management system
- * Copyright (C) 2018 Intelliants, LLC <https://intelliants.com>
+ * Copyright (C) 2019 Intelliants, LLC <https://intelliants.com>
  *
  * This file is part of Subrion.
  *
@@ -35,16 +35,18 @@ class iaPortfolio extends abstractModuleFront
 
     public $coreSearchEnabled = false;
 
-    protected $_patterns = [
-        'view' => 'portfolio/:category_alias:id-:title_alias.html'
-    ];
+    public function getUrl(array $data)
+    {
+        $id = !empty($data['id']) ? $data['id'] : '';
+        $category_alias = isset($data['category_alias']) ? $data['category_alias'] : '';
+        $title_alias = isset($data['title_alias']) ? $data['title_alias'] : '';
 
+        return $this->getInfo('url') . sprintf($this->getItemName() . '/%s/%d-%s.html', $category_alias, $id, $title_alias);
+    }
 
     public function url($action, array $data)
     {
-        empty($data['category_alias']) || $data['category_alias'].= IA_URL_DELIMITER;
-
-        return IA_URL . iaDb::printf($this->_patterns[$action], $data);
+        return $this->getUrl($data);
     }
 
     public function getFoundRows()

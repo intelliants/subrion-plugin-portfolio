@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Subrion - open source content management system
- * Copyright (C) 2018 Intelliants, LLC <https://intelliants.com>
+ * Copyright (C) 2019 Intelliants, LLC <https://intelliants.com>
  *
  * This file is part of Subrion.
  *
@@ -31,12 +31,12 @@ if (iaView::REQUEST_HTML == $iaView->getRequestType()) {
 
     array_shift($iaView->url);
 
+
     if ((int)end($iaView->url)) {
         $page = 'view';
     } elseif (!empty($iaView->url)) {
         $page = 'category';
     }
-
     switch ($page) {
         case 'index':
             $pagination = [
