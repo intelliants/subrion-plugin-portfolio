@@ -40,11 +40,11 @@ class iaPortfolio extends abstractModuleFront
     ];
 
 
-    public function url($action, array $data)
+    public function getUrl(array $data)
     {
         empty($data['category_alias']) || $data['category_alias'].= IA_URL_DELIMITER;
 
-        return IA_URL . iaDb::printf($this->_patterns[$action], $data);
+        return IA_URL . iaDb::printf($this->_patterns['view'], $data);
     }
 
     public function getFoundRows()

@@ -131,7 +131,7 @@ SQL;
             'url' => IA_ADMIN_URL . $this->getName() . '/categories/tree.json?noroot',
             'nodes' => implode(',', $nodes),
             'id' => $category['id'],
-            'title' => $category['title']
+            'title' => isset($category['title']) ? $category['title'] : ''
         ];
     }
 

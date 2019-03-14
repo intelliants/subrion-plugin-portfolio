@@ -81,13 +81,13 @@
     <config group="portfolio" name="portfolio_show_children_entries" values="1,0" type="radio" description="Show entries from subcategories on View Category pages">1</config>
 
     <blocks>
-        <block title="Top portfolio categories" name="top_portfolio_categories" position="left" type="smarty" sticky="1" classname="top-portfolio-categories" filename="block.top-portfolio-categories"><![CDATA[]]></block>
-        <block title="New portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="1" pages="portfolio" classname="new-portfolio-entries" filename="block.new-portfolio-entries"><![CDATA[]]></block>
+        <block title="Top portfolio categories" name="top_portfolio_categories" position="left" type="smarty" sticky="1" classname="top-portfolio-categories" filename="block.top-portfolio-categories.tpl"><![CDATA[]]></block>
+        <block title="New portfolio entries" name="new_portfolio_entries" position="verybottom" type="smarty" sticky="1" pages="portfolio" classname="new-portfolio-entries" filename="block.new-portfolio-entries.tpl"><![CDATA[]]></block>
     </blocks>
 
     <hooks>
-        <hook name="adminDatabaseConsistency" type="smarty" page_type="admin" filename="hook.db-consistency"><![CDATA[]]></hook>
-        <hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load"><![CDATA[]]></hook>
+        <hook name="adminDatabaseConsistency" type="smarty" page_type="admin" filename="hook.db-consistency.tpl"><![CDATA[]]></hook>
+        <hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load.php"><![CDATA[]]></hook>
     </hooks>
 
     <install>
