@@ -25,7 +25,9 @@
             {$entry.body}
         </div>
 
-        <p><span class="fa fa-folder-open"></span> <a href="{$entry.link}">{$category.title|escape}</a></p>
+        {if !empty($category.title)}
+            <p><span class="fa fa-folder-open"></span> <a href="{$category.link}">{$category.title|escape}</a></p>
+        {/if}
 
         <hr>
         <!-- AddThis Button BEGIN -->
