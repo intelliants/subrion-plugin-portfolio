@@ -24,3 +24,4 @@
     {include 'field-type-content-fieldset.tpl' isSystem=true datetime=true}
 </form>
 {ia_add_media files='js:_IA_URL_modules/portfolio/js/admin/categories'}
+

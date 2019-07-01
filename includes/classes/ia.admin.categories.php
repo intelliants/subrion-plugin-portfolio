@@ -2,7 +2,7 @@
 /******************************************************************************
  *
  * Subrion - open source content management system
- * Copyright (C) 2017 Intelliants, LLC <https://intelliants.com>
+ * Copyright (C) 2019 Intelliants, LLC <https://intelliants.com>
  *
  * This file is part of Subrion.
  *
@@ -27,7 +27,7 @@
 class iaCategories extends iaAbstractHelperCategoryFlat
 {
     protected static $_table = 'portfolio_categs';
-    protected $_itemName = 'portfolio_categs';
+    protected $_itemName = 'portfolio_categ';
 
     protected $_activityLog = ['item' => 'portfolio_categs'];
 

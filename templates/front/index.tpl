@@ -2,7 +2,7 @@
     <div class="portfolio-entries">
         <div class="row">
             {foreach $entries as $entry}
-                {include file='extra:portfolio/list-portfolio'}
+                {include file='module:portfolio/list-portfolio.tpl'}
 
                 {if $entry@iteration % 4 == 0 && !$entry@last}
                     </div>

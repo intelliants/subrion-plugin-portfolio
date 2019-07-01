@@ -4,13 +4,13 @@
     <summary>Allows to create a portfolio section</summary>
     <author>Intelliants LLC</author>
     <contributor>Intelliants LLC</contributor>
-    <version>4.1.0</version>
-    <date>2017-08-09</date>
-    <compatibility>4.1</compatibility>
+    <version>4.2.0</version>
+    <date>2018-03-07</date>
+    <compatibility>4.2</compatibility>
 
     <items>
         <item table_name="portfolio" payable="0">portfolio</item>
-        <item payable="0">portfolio_categs</item>
+        <item payable="0">portfolio_categ</item>
     </items>
 
     <actions>
@@ -86,7 +86,7 @@
     </blocks>
 
     <hooks>
-        <hook name="adminDatabaseConsistency" type="smarty" page_type="admin" filename="hook.db-consistency.tpl"><![CDATA[]]></hook>
+        <hook name="adminDatabaseConsistency" type="smarty" page_type="admin" filename="hook.db-consistency.php"><![CDATA[]]></hook>
         <hook name="phpCoreBeforePageDisplay" type="php" page_type="front" filename="hook.blocks-load.php"><![CDATA[]]></hook>
     </hooks>
 
