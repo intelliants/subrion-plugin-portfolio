@@ -151,9 +151,7 @@ class iaBackendController extends iaAbstractControllerModuleBackend
 
     protected function _update(array $entryData, $entryId)
     {
-        $this->getHelper()->update($entryData, $entryId);
-
-        return (0 === $this->_iaDb->getErrorNumber());
+        return $this->getHelper()->update($entryData, $entryId);
     }
 
     protected function _delete($entryId)
